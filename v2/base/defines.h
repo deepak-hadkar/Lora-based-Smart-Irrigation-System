@@ -1,8 +1,8 @@
 // Set sleep time, when value is 1 almost sleep 8s,when value is 450, almost 1 hour.
-#define SLEEP_CYCLE 2 // 450
+// #define SLEEP_CYCLE 1 // 450
 
 // Set Lora frequency
-#define FREQUENCY 868.0 // 434.0 // 915.0
+#define FREQUENCY 434.0 // 868.0 // 915.0
 
 // Unique antenna spec.(Must be same for trans-receive)
 #define BANDWIDTH 125.0
@@ -23,12 +23,6 @@
 #define SPI_MOSI 11
 #define SPI_MISO 12
 #define SPI_SCK 13
-
-#define VOLTAGE_PIN A0 // Read battery voltage
-
-#define IN1 3
-#define IN2 5
-#define PUMP_PIN A1 // Relay for Pump
 
 #define SERIAL_ENABLE 0
 

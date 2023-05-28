@@ -6,7 +6,9 @@
 #include <avr/sleep.h>
 
 // HS300x Sensor
-#include <Arduino_HS300x.h>
+#include <Catena-HS300x.h>
+using namespace McciCatenaHs300x;
+cHS300x gHs300x {Wire};
 
 bool readSensorStatus = false;
 int soilMoisture = 0; // the moisture of soil

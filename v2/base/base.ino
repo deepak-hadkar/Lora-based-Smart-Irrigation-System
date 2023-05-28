@@ -3,12 +3,10 @@
 #include "customs.h"
 #include "defines.h"
 
-String wifi_id = String("ID:") + "DTH1 [LoRa]: ";  // ID:DHT1 [LORA]:
-String send_id = String("ID:") + "DTH1 [VALVE]: "; // ID:DHT1 [VALVE]:
+String send_id = String("ID:") + "DTH1 [BASE]: "; // ID:DHT1 [BASE]:
 
 void Lora_init()
 {
-  // SX1278::begin(434.0, 125.0, 9, 7, SX127X_SYNC_WORD, 10, 8, 0);
   int state = radio.begin(FREQUENCY, BANDWIDTH, SPREADING_FACTOR, CODING_RATE, SX127X_SYNC_WORD, OUTPUT_POWER, PREAMBLE_LEN, GAIN);
 
   if (state == RADIOLIB_ERR_NONE)
@@ -54,15 +52,6 @@ void setup()
   delay(100);
 #endif
 
-  pinMode(IN1, OUTPUT);
-  pinMode(IN2, OUTPUT);
-  pinMode(PUMP_PIN, OUTPUT);
-
-  digitalWrite(IN1, LOW);
-  digitalWrite(IN2, LOW);
-  digitalWrite(PUMP_PIN, LOW);
-  delay(100);
-
   pinMode(LORA_RST, OUTPUT);
   digitalWrite(LORA_RST, HIGH);
   delay(100);
@@ -70,59 +59,19 @@ void setup()
   Lora_init();
 
   do_some_work();
-
-#if SERIAL_ENABLE
-  Serial.println("[Set]Sleep Mode Set");
-#endif
-
-  if (sleepMode)
-  {
-    low_power_set();
-    sleepMode = false;
-  }
-}
-
-void Valve_on()
-{
-  //  Serial.println(F("PUMP ON == Valve ON!"));
-  valveStatus = 1;
-  digitalWrite(IN1, HIGH);
-  digitalWrite(IN2, LOW);
-  delay(100);
-}
-void Valve_off()
-{
-  //  Serial.println(F("PUMP OFF == Valve OFF!"));
-  valveStatus = 0;
-  digitalWrite(IN1, LOW);
-  digitalWrite(IN2, HIGH);
-  delay(100);
 }
 
 void loop()
 {
-  wdt_disable();
-
-  if (count > SLEEP_CYCLE) //(7+1) x 8S  450
-  {
-
 #if SERIAL_ENABLE
-    Serial.println("<<Code start");
+  Serial.println("<<Code start");
 #endif
 
-    do_some_work();
+  do_some_work();
 
 #if SERIAL_ENABLE
-    Serial.println("Code end>>");
+  Serial.println("Code end>>");
 #endif
-    count = 0; // count init
-  }
-
-  if (sleepMode)
-  {
-    low_power_set();
-    sleepMode = false;
-  }
 }
 
 void do_some_work()
@@ -133,49 +82,18 @@ void do_some_work()
   Lora_init();
   delay(50);
 
-  while (lora_receive)
-  {
-    receive_lora();
-  }
+  receive_lora();
 
-  if ((moisture <= lowThreshold || valveControl == 1) && done_flag == 0) // "Relay-Pump && Valve On"
-  {
-    Valve_on();
-    digitalWrite(IN1, LOW);
-    digitalWrite(IN2, LOW);
-    delay(3000);
+  receiveESP8266();
 
-    digitalWrite(PUMP_PIN, HIGH); // Relay-Pump on
-
-    done_flag = 1;
-
-    sleepMode = false; // Disable Sleep Mode
-  }
-
-  if ((moisture <= highThreshold || valveControl == 0) && done_flag == 1) // "Relay-Pump && Valve Off"
-  {
-    digitalWrite(PUMP_PIN, LOW); // Relay-Pump Off
-    delay(1000);
-    Valve_off();
-    digitalWrite(IN1, LOW);
-    digitalWrite(IN2, LOW);
-    delay(3000);
-
-    done_flag = 0;
-
-    sleepMode = true; // Enable Sleep Mode
-  }
-
-  batteryMeasure();
-
-  send_lora(); // To Base-Station
+  send_lora();
 
   delay(100);
 }
 
 void send_lora()
 {
-  String loraMessage = send_id + "0," + (String)soilIndex + ',' + (String)soilMoisture + ',' + (String)soilHumidity + ',' + (String)soilTemperature + ',' + (String)soilBattery + ',' + (String)valveIndex + ',' + (String)valveStatus + ',' + (String)valveBattery + ",0";
+  String loraMessage = send_id + "0," + (String)valveControl + ',' + (String)highThreshold + ',' + (String)lowThreshold + ",0";
 
   String back_str = "<" + loraMessage + ">";
 
@@ -183,15 +101,14 @@ void send_lora()
   Serial.println();
   Serial.println(back_str);
 #endif
-  radio.transmit(back_str); //<ID:DTH1 [VALVE]: 0,1,855,81.91,30.62,1,88,1,0,98,0>
-  valveIndex++;
+  radio.transmit(back_str); //<ID:DTH1 [BASE]: 0,1,75,30,0>
   delay(100);
 }
 
 void receive_lora()
 {
   String received_str;
-  int state = radio.receive(received_str); // <ID:DTH1 [SOIL]: 0,833,81.91,30.62,88,0>
+  int state = radio.receive(received_str); //<ID:DTH1 [VALVE]: 0,1,855,81.91,30.62,1,88,1,0,98,0>
 
   if (state == RADIOLIB_ERR_NONE)
   {
@@ -222,8 +139,7 @@ void receive_lora()
     Serial.println(F(" Hz"));
 #endif
 
-    // String received_str = <ID:DTH1 [SOIL]: 0,0,833,81.91,30.62,88,0>
-    // String received_str = <ID:DTH1 [BASE]: 0,Status,highThreshold,lowThreshold,0>
+    // String received_str = <ID:DTH1 [VALVE]: 0,1,855,81.91,30.62,1,88,1,0,98,0>
     process_message(received_str);
   }
 
@@ -237,134 +153,35 @@ void receive_lora()
 #endif
 }
 
-void all_pins_low()
+void receiveESP8266()
 {
-  radio.sleep();
-  delay(1000);
+  //  String loraMessage = "<ID:DTH001 [LoRa]: 0,1,5,81.91,30.62,1,88,1,0,98,0>";
 
-  lora_receive = false;
-
-  digitalWrite(IN1, LOW);
-  digitalWrite(IN2, LOW);
-  digitalWrite(PUMP_PIN, LOW);
-  delay(50);
-}
-
-ISR(WDT_vect)
-{
-#if DEBUG_OUT_ENABLE
-  Serial.print("[Watch dog]");
-  Serial.println(count);
-#endif
-  delay(100);
-  count++;
-
-  wdt_disable(); // disable watchdog
-}
-
-// Set low power mode and into sleep
-void low_power_set()
-{
-  all_pins_low();
-  delay(10);
-  // disable ADC
-  ADCSRA = 0;
-
-  sleep_enable();
-  watchdog_init();
-  set_sleep_mode(SLEEP_MODE_PWR_DOWN);
-  delay(10);
-  noInterrupts();
-  sleep_enable();
-
-  // turn off brown-out enable in software
-  MCUCR = bit(BODS) | bit(BODSE);
-  MCUCR = bit(BODS);
-  interrupts();
-
-  sleep_cpu();
-  sleep_disable();
-}
-
-// Enable watch dog
-void watchdog_init()
-{
-  // clear various "reset" flags
-  MCUSR = 0;
-  // allow changes, disable reset
-  WDTCSR = bit(WDCE) | bit(WDE);
-  WDTCSR = bit(WDIE) | bit(WDP3) | bit(WDP0); // set WDIE, and 8 seconds delay
-  wdt_reset();                                // pat the dog
-}
-String getResetReason()
-{
-  String resetReason = "";
-  if (MCUSR & (1 << WDRF))
+  while (Serial.available() > 0 || !done)
   {
-    resetReason = "Watchdog";
-  }
-  else if (MCUSR & (1 << BORF))
-  {
-    resetReason = "Brown-out";
-  }
-  else if (MCUSR & (1 << EXTRF))
-  {
-    resetReason = "External";
-  }
-  else if (MCUSR & (1 << PORF))
-  {
-    resetReason = "Power-on";
-  }
-  MCUSR = 0;
-  wdt_disable();
-  return resetReason;
-}
-
-void batteryMeasure()
-{
-  // ADC0  internal 1.1V as ADC reference voltage
-  ADMUX = _BV(REFS1) | _BV(REFS0);
-
-  delay(50);
-  for (int i = 0; i < 3; i++)
-  {
-    // start ADC conversion
-    ADMUX &= 0xF0; // Clear the MUX bits
-    ADMUX |= 0x00; // Set MUX to select ADC0
-
-    ADCSRA |= (1 << ADSC);
-
-    delay(10);
-
-    if ((ADCSRA & 0x40) == 0)
+    char incoming_char = Serial.read();
+    // Check if start character is received
+    if (incoming_char == '<')
     {
-      ADC_O_1 = ADCL;
-      ADC_O_2 = ADCH;
-
-      valveBattery = (ADC_O_2 << 8) + ADC_O_1;
-      ADCSRA |= 0x40;
-#if SERIAL_ENABLE
-      Serial.print("BAT:");
-      Serial.print(valveBattery);
-
-      float voltage = (valveBattery * 1.1) / 1024.0;
-      Serial.print("Battery Voltage: ");
-      Serial.print(voltage);
-      Serial.println("V");
-#endif
+      received_message = "";
     }
-    ADCSRA |= (1 << ADIF); // reset as required
-    delay(50);
+
+    received_message += incoming_char;
+
+    if (incoming_char == '>')
+    {
+      process_message(received_message);
+      done = true;
+    }
   }
 }
 
 void process_message(String message)
 {
-
   message = message.substring(1, message.length() - 1); // Remove start and end characters
-  if (message.startsWith("ID:DTH1 [SOIL]: "))
+  if (message.startsWith("ID:DTH1 [VALVE]: "))
   {                        // check if the message is valid
-    message.remove(0, 16); // remove the ID and protocol information from the message
+    message.remove(0, 17); // remove the ID and protocol information from the message
 
 #if SERIAL_ENABLE
     Serial.println("Received data: " + message);
@@ -387,14 +204,14 @@ void process_message(String message)
     soilMoisture = extractedValues[2];
     soilHumidity = extractedValues[3];
     soilTemperature = extractedValues[4];
+    soilStatus = extractedValues[5];
     soilBattery = extractedValues[6];
+    valveIndex = extractedValues[7];
+    valveStatus = extractedValues[8];
+    valveBattery = extractedValues[9];
     delay(100);
-
-    moisture = map(soilMoisture, dry_value, wet_value, 0, 100);
-    delay(50);
   }
-
-  else if (message.startsWith("ID:DTH1 [BASE]: "))
+  else if (message.startsWith("ID:DTH1 [WIFI]: "))
   {                        // check if the message is valid
     message.remove(0, 16); // remove the ID and protocol information from the message
 
@@ -420,6 +237,7 @@ void process_message(String message)
     lowThreshold = extractedValues[3];
     delay(100);
   }
+
   else
   {
     // Do Nothing

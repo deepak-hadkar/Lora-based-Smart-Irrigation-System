@@ -3,33 +3,43 @@
 #include "customs.h"
 #include "defines.h"
 
-String node_id = String("ID:") + "DTH2";
+String node_id = String("ID:") + "DTH1" + " [SOIL]:"; // ID:DHT1 [SOIL]:
 
 bool HS3004_init()
 {
   bool ret = false;
-
-  if (!HS300x.begin())   //  Wire.begin();
+  //  Wire.begin();
+  if (!gHs300x.begin())
   {
 #if SERIAL_ENABLE
-    Serial.println("Failed to initialize!! HS300x not detected");
+    Serial.println("HS300x not detected. Please check wiring. Freezing.");
 #endif
   }
-  else
+  cHS300x::Measurements m;
+  float t, rh;
+
+  if (gHs300x.getTemperatureHumidity(m) == true)
   {
-    float temperature = HS300x.readTemperature();
-    float humidity    = HS300x.readHumidity();
+    m.extract(t, rh);
+    temperature = t;
+    humidity = rh;
     ret = true;
+  }
+  if (!gHs300x.getTemperatureHumidity(m))
+  {
+#if SERIAL_ENABLE
+    Serial.println(F("Failed to read from HS300x sensor!"));
+#endif
   }
   return ret;
 }
 
 void Lora_init()
 {
-  //SX1278::begin(434.0, 125.0, 9, 7, SX127X_SYNC_WORD, 10, 8, 0);
   int state = radio.begin(FREQUENCY, BANDWIDTH, SPREADING_FACTOR, CODING_RATE, SX127X_SYNC_WORD, OUTPUT_POWER, PREAMBLE_LEN, GAIN);
 
-  if (state == RADIOLIB_ERR_NONE) {
+  if (state == RADIOLIB_ERR_NONE)
+  {
     datarateValue = radio.getDataRate(); // Data rate in bps
 #if SERIAL_ENABLE
     Serial.println(F("Success!"));
@@ -50,7 +60,8 @@ void Lora_init()
     Serial.println(F(" Hz"));
 #endif
   }
-  else {
+  else
+  {
 #if SERIAL_ENABLE
     Serial.print(F("Failed, code "));
     Serial.println(state);
@@ -68,7 +79,7 @@ void setup()
 #endif
 
   pinMode(SENSOR_POWER_PIN, OUTPUT);
-  digitalWrite(SENSOR_POWER_PIN, HIGH); //Sensor power on
+  digitalWrite(SENSOR_POWER_PIN, HIGH); // Sensor power on
   delay(1000);
 
   // set up Timer 1
@@ -86,7 +97,7 @@ void setup()
 
   HS3004_init();
 
-  do_some_work();   //setup over
+  do_some_work(); // setup over
 
 #if SERIAL_ENABLE
   Serial.println("[Set]Sleep Mode Set");
@@ -101,22 +112,20 @@ void loop()
   if (count > SLEEP_CYCLE) //(7+1) x 8S = 450
   {
 #if SERIAL_ENABLE
-    Serial.println("Code start>>"); //code start
+    Serial.println("Code start>>"); // code start
 #endif
 
     do_some_work();
 
 #if SERIAL_ENABLE
-    Serial.println("Code end<<"); //code end
+    Serial.println("Code end<<"); // code end
 #endif
 
-    count = 0; //count init
+    count = 0; // count init
   }
 
   low_power_set();
 }
-
-
 
 void do_some_work()
 {
@@ -126,7 +135,7 @@ void do_some_work()
   digitalWrite(LORA_RST, HIGH);
   delay(5);
 
-  pinMode(PWM_OUT_PIN, OUTPUT);    //digitalWrite(PWM_OUT_PIN, LOW);
+  pinMode(PWM_OUT_PIN, OUTPUT);    // digitalWrite(PWM_OUT_PIN, LOW);
   TCCR1A = bit(COM1A0);            // toggle OC1A on Compare Match
   TCCR1B = bit(WGM12) | bit(CS10); // CTC, scale to clock
   OCR1A = 1;                       // compare A register value (5000 * clock speed / 1024).When OCR1A == 1, PWM is 2MHz
@@ -144,8 +153,8 @@ void do_some_work()
 
 void send_lora()
 {
-  String message = node_id + " [SOIL]:" + " 0," + (String)soilIndex + ',' + (String)soilMoisture + "," + (String)humidity + "," + (String)temperature + "," + (String)batValue + ",0";
-  String loraMessage =  "<" + message + ">";
+  String message = node_id + " 0," + (String)soilIndex + ',' + (String)soilMoisture + "," + (String)humidity + "," + (String)temperature + "," + (String)batValue + ",0";
+  String loraMessage = "<" + message + ">";
 
 #if SERIAL_ENABLE
   Serial.println();
@@ -168,7 +177,7 @@ ISR(WDT_vect)
   wdt_disable(); // disable watchdog
 }
 
-//Enable watch dog
+// Enable watch dog
 void watchdog_init()
 {
   // clear various "reset" flags
@@ -192,7 +201,7 @@ void all_pins_low()
   pinMode(A5, INPUT_PULLUP);
 }
 
-//Set low power mode and into sleep
+// Set low power mode and into sleep
 void low_power_set()
 {
   all_pins_low();
@@ -216,19 +225,18 @@ void low_power_set()
   sleep_disable();
 }
 
-
 void soilMeasure()
 {
-  //ADC2  AVCC as reference voltage
+  // ADC2  AVCC as reference voltage
   ADMUX = _BV(REFS0) | _BV(MUX1);
 
-  ADCSRA = _BV(ADEN) | _BV(ADPS1) | _BV(ADPS0);  //8 MHz
-  //ADCSRA = _BV(ADEN) | _BV(ADPS2) | _BV(ADPS1) | _BV(ADPS0);  //16 MHz
+  ADCSRA = _BV(ADEN) | _BV(ADPS1) | _BV(ADPS0); // 8 MHz
+  // ADCSRA = _BV(ADEN) | _BV(ADPS2) | _BV(ADPS1) | _BV(ADPS0);  //16 MHz
 
   delay(50);
   for (int i = 0; i < 3; i++)
   {
-    //start ADC conversion
+    // start ADC conversion
     ADCSRA |= (1 << ADSC);
 
     delay(10);
@@ -239,13 +247,13 @@ void soilMeasure()
       ADC_O_2 = ADCH;
 
       soilMoisture = (ADC_O_2 << 8) + ADC_O_1;
-      //moisture = map(soilMoisture, dry_value, wet_value, 0, 100);
+      // moisture = map(soilMoisture, dry_value, wet_value, 0, 100);
       ADCSRA |= 0x40;
 
       if (readSensorStatus == false)
         readSensorStatus = HS3004_init();
     }
-    ADCSRA |= (1 << ADIF); //reset as required
+    ADCSRA |= (1 << ADIF); // reset as required
     delay(50);
   }
 #if SERIAL_ENABLE
@@ -256,13 +264,13 @@ void soilMeasure()
 
 void batteryMeasure()
 {
-  //ADC3  internal 1.1V as ADC reference voltage
+  // ADC3  internal 1.1V as ADC reference voltage
   ADMUX = _BV(REFS1) | _BV(REFS0) | _BV(MUX1) | _BV(MUX0);
 
   delay(50);
   for (int i = 0; i < 3; i++)
   {
-    //start ADC conversion
+    // start ADC conversion
     ADCSRA |= (1 << ADSC);
 
     delay(10);
@@ -275,7 +283,7 @@ void batteryMeasure()
       batValue = (ADC_O_2 << 8) + ADC_O_1;
       ADCSRA |= 0x40;
     }
-    ADCSRA |= (1 << ADIF); //reset as required
+    ADCSRA |= (1 << ADIF); // reset as required
     delay(50);
   }
 #if SERIAL_ENABLE
@@ -288,27 +296,3 @@ void batteryMeasure()
   Serial.println("V");
 #endif
 }
-
-//void valveFunction()
-//{
-// Valve function
-//  if (moisture <= 30 && valve_on == 0)
-//  {
-//#if SERIAL_ENABLE
-//    Serial.print("Turning ON valve");
-//#endif
-//
-//    valve_status = 1;
-//    valve_on = 1;
-//  }
-//
-//  if (moisture >= 80 && valve_on == 1)
-//  {
-//#if SERIAL_ENABLE
-//    Serial.print("Turning OFF valve");
-//#endif
-//
-//    valve_status = 0;
-//    valve_on = 0;
-//  }
-//}
