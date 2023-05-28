@@ -3,7 +3,6 @@
 #include <avr/sleep.h>
 
 bool lora_receive = false;
-bool sleepMode = false;
 
 int datarateValue = 0; // Data rate of SX1278 in bps
 int done_flag = 0;

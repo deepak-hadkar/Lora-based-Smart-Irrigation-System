@@ -84,11 +84,21 @@ void do_some_work()
 
   receive_lora();
 
-  receiveESP8266();
-
   send_lora();
 
+  sendWifi()
+
   delay(100);
+}
+
+void sendWifi()
+{
+  //  String loraMessage = "<ID:DTH001 [LoRa]: 0,1,5,81.91,30.62,1,88,1,0,98,0>";
+  String loraMessage = message_id + "0," + (String)soilIndex + ',' + (String)soilMoisture + ',' + (String)soilHumidity + ',' + (String)soilTemperature + ',' + (String)soilStatus + ',' + (String)soilBattery + ',' + (String)valveIndex + ',' + (String)valveStatus + ',' + (String)valveBattery + ",0";
+
+  Serial.println("<" + loraMessage + ">");
+  Serial.flush(); // Wait for data to be fully transmitted
+  delay(1000);
 }
 
 void send_lora()
@@ -153,27 +163,27 @@ void receive_lora()
 #endif
 }
 
-void receiveESP8266()
+void serialEvent()
 {
-  //  String loraMessage = "<ID:DTH001 [LoRa]: 0,1,5,81.91,30.62,1,88,1,0,98,0>";
-
-  while (Serial.available() > 0 || !done)
-  {
-    char incoming_char = Serial.read();
-    // Check if start character is received
-    if (incoming_char == '<')
+    while (Serial.available() > 0)
     {
-      received_message = "";
-    }
+        char incoming_char = Serial.read();
+        if (incoming_char == '<')
+        { // Check if start character is received
+            received_message = "";
+            message_started = true;
+        }
 
-    received_message += incoming_char;
-
-    if (incoming_char == '>')
-    {
-      process_message(received_message);
-      done = true;
+        if (message_started)
+        {
+            received_message += incoming_char;
+            if (incoming_char == '>')
+            { // Check if end character is received
+                process_message(received_message);
+                message_started = false;
+            }
+        }
     }
-  }
 }
 
 void process_message(String message)
