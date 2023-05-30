@@ -37,6 +37,7 @@ bool HS3004_init()
 void Lora_init()
 {
   int state = radio.begin(FREQUENCY, BANDWIDTH, SPREADING_FACTOR, CODING_RATE, SX127X_SYNC_WORD, OUTPUT_POWER, PREAMBLE_LEN, GAIN);
+  delay(1000);
 
   if (state == RADIOLIB_ERR_NONE)
   {
@@ -71,12 +72,10 @@ void Lora_init()
 
 void setup()
 {
-#if SERIAL_ENABLE
   Serial.begin(9600);
   delay(1000);
   Serial.println("Soil start.");
   delay(100);
-#endif
 
   pinMode(SENSOR_POWER_PIN, OUTPUT);
   digitalWrite(SENSOR_POWER_PIN, HIGH); // Sensor power on
@@ -281,6 +280,8 @@ void batteryMeasure()
       ADC_O_2 = ADCH;
 
       batValue = (ADC_O_2 << 8) + ADC_O_1;
+      batValue = batValue / 10;
+
       ADCSRA |= 0x40;
     }
     ADCSRA |= (1 << ADIF); // reset as required

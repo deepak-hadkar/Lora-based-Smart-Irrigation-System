@@ -24,6 +24,6 @@
 #define SPI_MISO 12
 #define SPI_SCK 13
 
-#define SERIAL_ENABLE 0
+#define SERIAL_ENABLE 1
 
 SX1278 radio = new Module(LORA_CS, DIO0, LORA_RST, DIO1);

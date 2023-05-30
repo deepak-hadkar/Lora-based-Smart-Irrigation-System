@@ -2,7 +2,7 @@
 #define SLEEP_CYCLE 2 // 450
 
 // Set Lora frequency
-#define FREQUENCY 868.0 // 434.0 // 915.0
+#define FREQUENCY 434.0 // 434.0 // 915.0
 
 // Unique antenna spec.(Must be same for trans-receive)
 #define BANDWIDTH 125.0
@@ -30,6 +30,6 @@
 #define IN2 5
 #define PUMP_PIN A1 // Relay for Pump
 
-#define SERIAL_ENABLE 0
+#define SERIAL_ENABLE 1
 
 SX1278 radio = new Module(LORA_CS, DIO0, LORA_RST, DIO1);

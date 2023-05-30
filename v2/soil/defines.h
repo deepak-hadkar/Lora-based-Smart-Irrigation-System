@@ -1,8 +1,8 @@
 //Set sleep time, when value is 1 almost sleep 8s,when value is 450, almost 1 hour.
-#define SLEEP_CYCLE 2 // 450
+#define SLEEP_CYCLE 1 // 450
 
 //Set Lora frequency
-#define FREQUENCY 868.0 // 868.0 // 915.0
+#define FREQUENCY 434.0 // 868.0 // 915.0
 
 //SX1278::begin(434.0, 125.0, 9, 7, SX127X_SYNC_WORD, 10, 8, 0);
 #define BANDWIDTH 125.0

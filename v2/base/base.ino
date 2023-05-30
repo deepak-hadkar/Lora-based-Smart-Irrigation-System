@@ -3,11 +3,12 @@
 #include "customs.h"
 #include "defines.h"
 
-String send_id = String("ID:") + "DTH1 [BASE]: "; // ID:DHT1 [BASE]:
+String send_id = String("ID:") + "DTH1 [BASE]: "; // ID:DHT1 [BASE]:<ID:DTH1 [WIFI]: 0,1,70,30,0>
 
 void Lora_init()
 {
   int state = radio.begin(FREQUENCY, BANDWIDTH, SPREADING_FACTOR, CODING_RATE, SX127X_SYNC_WORD, OUTPUT_POWER, PREAMBLE_LEN, GAIN);
+  delay(1000);
 
   if (state == RADIOLIB_ERR_NONE)
   {
@@ -48,7 +49,7 @@ void setup()
   Serial.println(getResetReason());
 
 #if SERIAL_ENABLE
-  Serial.println("Valve start.");
+  Serial.println("Base start.");
   delay(100);
 #endif
 
@@ -82,23 +83,28 @@ void do_some_work()
   Lora_init();
   delay(50);
 
-  receive_lora();
+  while (lora_receive)
+  {
+    receive_lora();
+  }
 
   send_lora();
 
-  sendWifi()
+
+  sendWifi();
 
   delay(100);
 }
 
 void sendWifi()
 {
-  //  String loraMessage = "<ID:DTH001 [LoRa]: 0,1,5,81.91,30.62,1,88,1,0,98,0>";
-  String loraMessage = message_id + "0," + (String)soilIndex + ',' + (String)soilMoisture + ',' + (String)soilHumidity + ',' + (String)soilTemperature + ',' + (String)soilStatus + ',' + (String)soilBattery + ',' + (String)valveIndex + ',' + (String)valveStatus + ',' + (String)valveBattery + ",0";
-
-  Serial.println("<" + loraMessage + ">");
+  //  String loraMessage = "<ID:DTH1 [BASE]: 0,1,5,81.91,30.62,88,1,0,98,0>";
+  String wifiMessage = send_id + "0," + (String)soilIndex + ',' + (String)soilMoisture + ',' + (String)soilHumidity + ',' + (String)soilTemperature + ',' + (String)soilBattery + ',' + (String)valveIndex + ',' + (String)valveStatus + ',' + (String)valveBattery + ",0";
   Serial.flush(); // Wait for data to be fully transmitted
-  delay(1000);
+  Serial.println("<" + wifiMessage + ">");
+  Serial.flush(); // Wait for data to be fully transmitted
+  delay(500);
+  lora_receive = true;
 }
 
 void send_lora()
@@ -111,6 +117,7 @@ void send_lora()
   Serial.println();
   Serial.println(back_str);
 #endif
+
   radio.transmit(back_str); //<ID:DTH1 [BASE]: 0,1,75,30,0>
   delay(100);
 }
@@ -118,7 +125,7 @@ void send_lora()
 void receive_lora()
 {
   String received_str;
-  int state = radio.receive(received_str); //<ID:DTH1 [VALVE]: 0,1,855,81.91,30.62,1,88,1,0,98,0>
+  int state = radio.receive(received_str); //<ID:DTH1 [VALVE]: 0,1,855,81.91,30.62,88,1,0,98,0>
 
   if (state == RADIOLIB_ERR_NONE)
   {
@@ -126,7 +133,6 @@ void receive_lora()
 #if SERIAL_ENABLE
     Serial.println(F("Success!"));
 #endif
-    lora_receive = true;
 
 #if SERIAL_ENABLE
     Serial.print(F("[SX1278] Data: "));
@@ -149,13 +155,20 @@ void receive_lora()
     Serial.println(F(" Hz"));
 #endif
 
-    // String received_str = <ID:DTH1 [VALVE]: 0,1,855,81.91,30.62,1,88,1,0,98,0>
+    // String received_str = <ID:DTH1 [VALVE]: 0,1,855,81.91,30.62,88,1,0,98,0>
     process_message(received_str);
   }
 
 #if SERIAL_ENABLE
-  else
-  {
+  else if (state == RADIOLIB_ERR_RX_TIMEOUT) {
+    // timeout occurred while waiting for a packet
+    Serial.println(F("timeout!"));
+  }
+  else if (state == RADIOLIB_ERR_CRC_MISMATCH) {
+    // packet was received, but is malformed
+    Serial.println(F("CRC error!"));
+  }
+  else {
     // some other error occurred
     Serial.print(F("failed, code "));
     Serial.println(state);
@@ -165,32 +178,33 @@ void receive_lora()
 
 void serialEvent()
 {
-    while (Serial.available() > 0)
-    {
-        char incoming_char = Serial.read();
-        if (incoming_char == '<')
-        { // Check if start character is received
-            received_message = "";
-            message_started = true;
-        }
-
-        if (message_started)
-        {
-            received_message += incoming_char;
-            if (incoming_char == '>')
-            { // Check if end character is received
-                process_message(received_message);
-                message_started = false;
-            }
-        }
+  while (Serial.available() > 0)
+  {
+    char incoming_char = Serial.read();
+    if (incoming_char == '<')
+    { // Check if start character is received
+      received_message = "";
+      message_started = true;
     }
+
+    if (message_started)
+    {
+      received_message += incoming_char;
+      if (incoming_char == '>')
+      { // Check if end character is received
+        process_message(received_message);
+        message_started = false;
+      }
+    }
+  }
 }
 
 void process_message(String message)
 {
   message = message.substring(1, message.length() - 1); // Remove start and end characters
   if (message.startsWith("ID:DTH1 [VALVE]: "))
-  {                        // check if the message is valid
+  { // check if the message is valid
+    lora_receive = false;
     message.remove(0, 17); // remove the ID and protocol information from the message
 
 #if SERIAL_ENABLE
@@ -202,7 +216,7 @@ void process_message(String message)
     for (int i = 0; i < message.length() && pos < MAX_VALUES; i++)
     { // loop through the string
       if (message.charAt(i) == ',')
-      {                                                                   // if a comma is found
+      { // if a comma is found
         extractedValues[pos++] = message.substring(lastIndex, i).toInt(); // extract the value and convert it to integer
         lastIndex = i + 1;                                                // set the index of the last comma to the next character after the comma
       }
@@ -214,15 +228,16 @@ void process_message(String message)
     soilMoisture = extractedValues[2];
     soilHumidity = extractedValues[3];
     soilTemperature = extractedValues[4];
-    soilStatus = extractedValues[5];
-    soilBattery = extractedValues[6];
-    valveIndex = extractedValues[7];
-    valveStatus = extractedValues[8];
-    valveBattery = extractedValues[9];
+    soilBattery = extractedValues[5];
+    valveIndex = extractedValues[6];
+    valveStatus = extractedValues[7];
+    valveBattery = extractedValues[8];
     delay(100);
+
+    lora_receive = false;
   }
-  else if (message.startsWith("ID:DTH1 [WIFI]: "))
-  {                        // check if the message is valid
+  if (message.startsWith("ID:DTH1 [WIFI]: "))
+  { // check if the message is valid
     message.remove(0, 16); // remove the ID and protocol information from the message
 
 #if SERIAL_ENABLE
@@ -234,7 +249,7 @@ void process_message(String message)
     for (int i = 0; i < message.length() && pos < MAX_VALUES; i++)
     { // loop through the string
       if (message.charAt(i) == ',')
-      {                                                                   // if a comma is found
+      { // if a comma is found
         extractedValues[pos++] = message.substring(lastIndex, i).toInt(); // extract the value and convert it to integer
         lastIndex = i + 1;                                                // set the index of the last comma to the next character after the comma
       }
@@ -252,4 +267,27 @@ void process_message(String message)
   {
     // Do Nothing
   }
+}
+String getResetReason()
+{
+  String resetReason = "";
+  if (MCUSR & (1 << WDRF))
+  {
+    resetReason = "Watchdog";
+  }
+  else if (MCUSR & (1 << BORF))
+  {
+    resetReason = "Brown-out";
+  }
+  else if (MCUSR & (1 << EXTRF))
+  {
+    resetReason = "External";
+  }
+  else if (MCUSR & (1 << PORF))
+  {
+    resetReason = "Power-on";
+  }
+  MCUSR = 0;
+  wdt_disable();
+  return resetReason;
 }
