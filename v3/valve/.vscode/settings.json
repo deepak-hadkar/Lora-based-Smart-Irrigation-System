@@ -1,0 +1,15 @@
+{
+    "files.associations": {
+        "__config": "cpp",
+        "atomic": "cpp",
+        "cstddef": "cpp",
+        "locale": "cpp",
+        "span": "cpp",
+        "string": "cpp",
+        "__string": "cpp",
+        "type_traits": "cpp",
+        "bitset": "cpp",
+        "typeinfo": "cpp",
+        "*.tpp": "cpp"
+    }
+}
