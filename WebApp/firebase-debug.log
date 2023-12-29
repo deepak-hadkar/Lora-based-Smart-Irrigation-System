@@ -1,0 +1,72 @@
+[debug] [2023-12-29T08:38:54.506Z] ----------------------------------------------------------------------
+[debug] [2023-12-29T08:38:54.507Z] Command:       /usr/local/bin/node /usr/local/bin/firebase init hosting
+[debug] [2023-12-29T08:38:54.508Z] CLI Version:   11.28.0
+[debug] [2023-12-29T08:38:54.508Z] Platform:      darwin
+[debug] [2023-12-29T08:38:54.508Z] Node Version:  v18.16.0
+[debug] [2023-12-29T08:38:54.508Z] Time:          Fri Dec 29 2023 14:08:54 GMT+0530 (India Standard Time)
+[debug] [2023-12-29T08:38:54.508Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2023-12-29T08:38:54.541Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2023-12-29T08:38:54.541Z] > authorizing via signed-in user (kjsce.efarm@gmail.com)
+[info] 
+     ######## #### ########  ######## ########     ###     ######  ########
+     ##        ##  ##     ## ##       ##     ##  ##   ##  ##       ##
+     ######    ##  ########  ######   ########  #########  ######  ######
+     ##        ##  ##    ##  ##       ##     ## ##     ##       ## ##
+     ##       #### ##     ## ######## ########  ##     ##  ######  ########
+
+You're about to initialize a Firebase project in this directory:
+
+  /Users/deepakhadkar
+
+Before we get started, keep in mind:
+
+  * You are initializing within an existing Firebase project directory
+
+[info] 
+=== Project Setup
+[info] 
+[info] First, let's associate this project directory with a Firebase project.
+[info] You can create multiple project aliases by running firebase use --add, 
+[info] but for now we'll just set up a default project.
+[info] 
+[debug] [2023-12-29T08:38:54.543Z] Using project from CLI flag: efarm-dashboard
+[debug] [2023-12-29T08:38:54.543Z] > refreshing access token with scopes: []
+[debug] [2023-12-29T08:38:54.544Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2023-12-29T08:38:54.544Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2023-12-29T08:38:54.756Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2023-12-29T08:38:54.757Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2023-12-29T08:38:54.772Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/efarm-dashboard [none]
+[debug] [2023-12-29T08:38:55.240Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/efarm-dashboard 200
+[debug] [2023-12-29T08:38:55.240Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/efarm-dashboard {"projectId":"efarm-dashboard","projectNumber":"395430854188","displayName":"Efarm Dashboard","name":"projects/efarm-dashboard","resources":{"hostingSite":"efarm-dashboard","realtimeDatabaseInstance":"efarm-dashboard-default-rtdb","storageBucket":"efarm-dashboard.appspot.com","locationId":"us-central"},"state":"ACTIVE","etag":"1_c51953fd-6d23-40ef-b84f-9eb83c75d5bc"}
+[info] i  Using project efarm-dashboard (Efarm Dashboard) 
+[info] 
+=== Hosting Setup
+[info] 
+[info] Your public directory is the folder (relative to your project directory) that
+[info] will contain Hosting assets to be uploaded with firebase deploy. If you
+[info] have a build process for your assets, use your build's output directory.
+[info] 
+[info] ✔  Wrote public/404.html 
+[debug] [2023-12-29T08:39:38.422Z] >>> [apiv2][query] GET https://www.gstatic.com/firebasejs/releases.json [none]
+[debug] [2023-12-29T08:39:38.538Z] <<< [apiv2][status] GET https://www.gstatic.com/firebasejs/releases.json 200
+[debug] [2023-12-29T08:39:38.538Z] <<< [apiv2][body] GET https://www.gstatic.com/firebasejs/releases.json {"current":{"version":"10.7.1","browserURL":"https://www.gstatic.com/firebasejs/10.7.1/firebase.js","packageURL":"https://www.gstatic.com/firebasejs/10.7.1/firebase.tgz"},"live":{"version":"10.7","browserURL":"https://www.gstatic.com/firebasejs/live/10.7/firebase.js","packageURL":"https://www.gstatic.com/firebasejs/live/10.7/firebase.tgz"},"components":{"analytics":"https://www.gstatic.com/firebasejs/10.7.1/firebase-analytics.js","app":"https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js","app-check":"https://www.gstatic.com/firebasejs/10.7.1/firebase-app-check.js","auth":"https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js","auth/cordova":"https://www.gstatic.com/firebasejs/10.7.1/firebase-auth/cordova.js","functions":"https://www.gstatic.com/firebasejs/10.7.1/firebase-functions.js","firestore":"https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js","firestore/lite":"https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore/lite.js","installations":"https://www.gstatic.com/firebasejs/10.7.1/firebase-installations.js","storage":"https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js","performance":"https://www.gstatic.com/firebasejs/10.7.1/firebase-performance.js","remote-config":"https://www.gstatic.com/firebasejs/10.7.1/firebase-remote-config.js","messaging":"https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging.js","messaging/sw":"https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging/sw.js","database":"https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js","firestore.memory":"https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.memory.js"}}
+[info] i  Skipping write of public/index.html 
+[info] 
+[info] i  Detected a .git folder at /Users/deepakhadkar/Documents/GitHub/Lora-based-Smart-Irrigation-System 
+[info] i  Authorizing with GitHub to upload your service account to a GitHub repository's secrets store. 
+[info] 
+[info] Visit this URL on this device to log in:
+[info] https://github.com/login/oauth/authorize?client_id=89cf50f02ac6aaed3484&state=73759509&redirect_uri=http%3A%2F%2Flocalhost%3A9005&scope=read%3Auser%20repo%20public_repo
+[info] 
+[info] Waiting for authentication...
+[debug] [2023-12-29T08:39:55.700Z] >>> [apiv2][query] POST https://github.com/login/oauth/access_token [none]
+[debug] [2023-12-29T08:39:55.701Z] >>> [apiv2][body] POST https://github.com/login/oauth/access_token [stream]
+[debug] [2023-12-29T08:39:56.042Z] <<< [apiv2][status] POST https://github.com/login/oauth/access_token 200
+[debug] [2023-12-29T08:39:56.042Z] <<< [apiv2][body] POST https://github.com/login/oauth/access_token {"access_token":"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","token_type":"bearer","scope":"read:user,repo"}
+[debug] [2023-12-29T08:39:56.052Z] >>> [apiv2][query] GET https://api.github.com/user [none]
+[debug] [2023-12-29T08:39:56.402Z] <<< [apiv2][status] GET https://api.github.com/user 200
+[debug] [2023-12-29T08:39:56.403Z] <<< [apiv2][body] GET https://api.github.com/user {"login":"deepak-hadkar","id":87772116,"node_id":"MDQ6VXNlcjg3NzcyMTE2","avatar_url":"https://avatars.githubusercontent.com/u/87772116?v=4","gravatar_id":"","url":"https://api.github.com/users/deepak-hadkar","html_url":"https://github.com/deepak-hadkar","followers_url":"https://api.github.com/users/deepak-hadkar/followers","following_url":"https://api.github.com/users/deepak-hadkar/following{/other_user}","gists_url":"https://api.github.com/users/deepak-hadkar/gists{/gist_id}","starred_url":"https://api.github.com/users/deepak-hadkar/starred{/owner}{/repo}","subscriptions_url":"https://api.github.com/users/deepak-hadkar/subscriptions","organizations_url":"https://api.github.com/users/deepak-hadkar/orgs","repos_url":"https://api.github.com/users/deepak-hadkar/repos","events_url":"https://api.github.com/users/deepak-hadkar/events{/privacy}","received_events_url":"https://api.github.com/users/deepak-hadkar/received_events","type":"User","site_admin":false,"name":"DeepakHadkar","company":"KJSCE","blog":"https://kjsce.somaiya.edu/en","location":"Mumbai","email":null,"hireable":null,"bio":"B.Tech in ETRX Student at KJ Somaiya College of Engineering - Interested in PCB Designing, Internet of things, Arduino.","twitter_username":"_deepak_hadkar_","public_repos":3,"public_gists":0,"followers":2,"following":9,"created_at":"2021-07-21T15:41:53Z","updated_at":"2023-12-29T07:22:44Z","private_gists":0,"total_private_repos":8,"owned_private_repos":8,"disk_usage":564425,"collaborators":1,"two_factor_authentication":false,"plan":{"name":"free","space":976562499,"collaborators":0,"private_repos":10000}}
+[info] 
+[info] ✔  Success! Logged into GitHub as deepak-hadkar 
+[info] 
