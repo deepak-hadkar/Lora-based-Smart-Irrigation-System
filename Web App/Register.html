@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Register</title>
+    <style>
+        .box {
+            background-color:#3ab2ac;
+            border-radius: 10px;
+            margin: auto;
+            padding: 20px;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 450px;
+            transform: translate(-50%, -50%);
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        input {
+            border-radius: 5px;
+            border: none;
+            padding: 10px;
+            margin-bottom: 10px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        input[type="submit"] {
+            background-color:#ff2b78;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #2f4f4f;
+        }
+    </style>
+
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-auth.js"></script>
+    <script type="module">
+      window.addEventListener("load", function () {
+        // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+      const firebaseConfig = {
+        apiKey: "AIzaSyAbdlXLeHw5cUyB9OnlhNuXZPQRbg8NID8",
+        authDomain: "efarm-dashboard.firebaseapp.com",
+        databaseURL: "https://efarm-dashboard-default-rtdb.firebaseio.com",
+        projectId: "efarm-dashboard",
+        storageBucket: "efarm-dashboard.appspot.com",
+        messagingSenderId: "395430854188",
+        appId: "1:395430854188:web:63f1da7c4cc93357addb89",
+        measurementId: "G-8HQ25GL1NN"
+      };
+
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+
+        var registerForm = document.querySelector("form");
+
+        registerForm.addEventListener("submit", function (event) {
+          event.preventDefault();
+
+          var email = document.getElementById("email").value;
+          var password = document.getElementById("password").value;
+          var confirmPassword =
+            document.getElementById("confirm-password").value;
+
+          if (password !== confirmPassword) {
+            alert("Passwords do not match!");
+            return;
+          }
+
+          auth
+            .createUserWithEmailAndPassword(email, password)
+            .then(function (userCredential) {
+              window.location.href = "account.html";
+            })
+            .catch(function (error) {
+              console.log(error.code, error.message);
+            });
+        });
+
+        firebase.auth().onAuthStateChanged(function (user) {
+          if (user) {
+            // User is signed in, redirect to account page
+            window.location.href = "account.html";
+          }
+        });
+      });
+    </script>
+  </head>
+  <body>
+    <div class="box">
+    <h1>Register</h1>
+    <form>
+      <label for="email">Email:</label>
+      <input type="email" id="email" name="email" /><br /><br />
+      <label for="password">Password:</label>
+      <input type="password" id="password" name="password" /><br /><br />
+      <label for="confirm-password">Confirm Password:</label>
+      <input
+        type="password"
+        id="confirm-password"
+        name="confirm-password"
+      /><br /><br />
+      <input type="submit" value="Submit" />
+    </form>
+    </div>
+  </body>
+</html>

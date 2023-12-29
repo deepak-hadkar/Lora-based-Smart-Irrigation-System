@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <link rel="stylesheet" type="text/css" href="css/style2.css">
+    <link rel="stylesheet" type="text/css" href="style33.css">
+
+  <!-- slider css -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick.min.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick-theme.min.css">
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.4.1/dist/css/bootstrap.min.css"
+		integrity="sha384-HSMxcRTRxnN+Bdg0JdbxYKrThecOKuH5zCYotlSAcp1+c8xmyTe9GYg1l9a69psu" crossorigin="anonymous">
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+
+
+  <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-database.js"></script>
+  <script src="script.js"></script> 
+  <script type="module">
+    window.addEventListener("load", function () {
+      // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+      const firebaseConfig = {
+        apiKey: "AIzaSyAbdlXLeHw5cUyB9OnlhNuXZPQRbg8NID8",
+        authDomain: "efarm-dashboard.firebaseapp.com",
+        databaseURL: "https://efarm-dashboard-default-rtdb.firebaseio.com",
+        projectId: "efarm-dashboard",
+        storageBucket: "efarm-dashboard.appspot.com",
+        messagingSenderId: "395430854188",
+        appId: "1:395430854188:web:63f1da7c4cc93357addb89",
+        measurementId: "G-8HQ25GL1NN"
+      };
+
+      firebase.initializeApp(firebaseConfig);
+      const auth = firebase.auth();
+      const database = firebase.database();
+
+      // var logoutButton = document.getElementById("logout-button");
+
+      // logoutButton.addEventListener("click", function () {
+      //   auth.signOut().then(function () {
+      //     window.location.href = "sign_in.html";
+      //   });
+      // });
+
+      firebase.auth().onAuthStateChanged(function (user) {
+        console.log("Auth state changed:", user);
+
+        if (!user) {
+          // User is not signed in, redirect to login page
+          console.log("User not signed in, redirecting to login page");
+          window.location.href = "sign_in.html";
+        } else {
+          var uid = user.uid;
+          console.log("User ID:", uid);
+
+          var temperatureElement = document.getElementById("temperature");
+          var moistureElement = document.getElementById("moisture");
+          var humidityElement = document.getElementById("humidity");
+          var OnTimeElement = document.getElementById("OnTime");
+          var OffTimeElement = document.getElementById("OffTime");
+          var TimestampElement = document.getElementById("Timestamp");
+
+          firebase.database().ref("user/" + uid + "/sensor").on("value", function (snapshot) {
+            console.log("Data snapshot:", snapshot.val());
+
+            var data = snapshot.val();
+
+            if (data) {
+              var temperature = data.Temperature;
+              var humidity = data.Humidity;
+              var moisture = data.Moisture;
+              var Timestamp = data.Timestamp;
+
+              console.log("Temperature:", temperature);
+              console.log("Humidity:", humidity);
+              console.log("Moisture:", moisture);
+              console.log("Timestamp:", Timestamp);
+        
+
+              if (typeof temperature == "number") {
+                temperatureElement.innerHTML = temperature + "°C";
+              } else {
+                temperatureElement.innerHTML = "Error: Temperature data not in expected format";
+              }
+
+              if (typeof humidity == "number") {
+                humidityElement.innerHTML = humidity + "%";
+              } else {
+                humidityElement.innerHTML = "Error: Humidity data not in expected format";
+              }
+
+              if (typeof moisture == "number") {
+                moistureElement.innerHTML = moisture + "%";
+              } else {
+                moistureElement.innerHTML = "Error: Moisture data not in expected format";
+              }
+
+              if (typeof Timestamp == "number") {
+                TimestampElement.innerHTML = Timestamp;;
+              } else {
+                TimestampElement.innerHTML = "Error: data not in expected format";
+              }
+
+
+            } else {
+              temperatureElement.innerHTML = "Error: No temperature data found";
+              humidityElement.innerHTML = "Error: No humidity data found";
+              moistureElement.innerHTML = "Error: No moisture data found";
+              TimestampElement.innerHTML = "Error: No data found";
+            }
+          });
+
+
+          firebase.database().ref("user/" + uid + "/actuator").on("value", function (snapshot) {
+            console.log("Data snapshot:", snapshot.val());
+
+            var data = snapshot.val();
+
+            if (data) {
+              var OnTime = data.OnTime;
+              var OffTime = data.OffTime;
+              
+
+              console.log("OnTime:",OnTime);
+              console.log("OffTime:", OffTime);
+        
+
+              /* if (typeof OnTime == "number") { */
+                OnTimeElement.innerHTML = OnTime;
+             /*  } else { 
+                OnTimeElement.innerHTML = "Error: Ontime data not in expected format";
+              } */
+
+              /* if (typeof OffTime == "number") { */
+                OffTimeElement.innerHTML = OffTime;
+              /* else {
+                OffTimeElement.innerHTML = "Error: OffTime data not in expected format";
+              } */
+
+            } else {
+              OnTimeElement.innerHTML = "Error: No OnTime data found";
+              OffTimeElement.innerHTML = "Error: No OffTime data found";
+            }
+          });
+
+
+          firebase.database().ref("user/" + uid + "/sensor").on("value", function (snapshot) {
+            console.log("Data snapshot:", snapshot.val());
+
+            var data = snapshot.val();
+
+            if (data) {
+              var Timestamp = data.Timestamp;
+            
+              console.log("Timestamp:", Timestamp);
+        
+
+              /* if (typeof OnTime == "number") { */
+                TimestampElement.innerHTML = Timestamp;
+             /*  } else { 
+                OnTimeElement.innerHTML = "Error: Ontime data not in expected format";
+              } */
+            } else {
+              TimestampElement.innerHTML = "Error: No OnTime data found";
+            }
+          });
+
+
+          firebase.database().ref("user/" + uid + "/actuator").on("value", function (snapshot) {
+            console.log("Data snapshot:", snapshot.val());
+
+            var data = snapshot.val();
+
+            if (data) {
+              var OnTime = data.OnTime;
+            
+              console.log("CurrentOnTime:",OnTime);
+              window.document.getElementById('CurrentOnTime').textContent = OnTime;
+
+              /* if (typeof OnTime == "number") { */
+                OnTimeElement.innerHTML = OnTime;
+             /*  } else { 
+                OnTimeElement.innerHTML = "Error: Ontime data not in expected format";
+              } */
+            } else {
+              OnTimeElement.innerHTML = "Error: No OnTime data found";
+            }
+          });
+
+        }
+      });
+    });
+  </script>
+</head>
+
+
+<body>
+
+    <nav class="navbar navbar-default">
+		<div class="container-fluid">
+			<!-- Brand and toggle get grouped for better mobile display -->
+			<div class="navbar-header">
+				<button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+					data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+					<span class="sr-only">Toggle navigation</span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+				</button>
+				<a class="navbar-brand" href="#">
+					<h4 class="text-lg">SmartAgro</h4>
+				</a>
+			</div>
+
+			<!-- Collect the nav links, forms, and other content for toggling -->
+			<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+
+
+				<ul class="nav navbar-nav navbar-right">
+					<li><a href="account.html">Dashboard</a></li>
+					<li><a href="calendar.html">Calender</a></li>
+					<li><a href="analytics.html">Analytics</a></li>
+					<li><a href="sign_out.html">Logout</a></li>
+
+				</ul>
+			</div><!-- /.navbar-collapse -->
+		</div><!-- /.container-fluid -->
+	</nav>
+  
+    <h1>Welcome to your Dashboard!</h1>
+  <main>
+  <!-- Display temperature and humidity data -->
+  <div class="main-container">
+    <div class="box-container">
+      <p>Temperature: <span id="temperature"></span></p>
+    </div>
+    <div class="box-container">
+      <p>Humidity: <span id="humidity"></span></p>
+    </div>
+    <div class="box-container">
+      <p>Moisture: <span id="moisture"></span></p>
+    </div>
+
+    <div class="box-container">
+      <p>Valve ON Time: <span id="OnTime"></span></p>
+    </div>
+
+    <div class="box-container">
+      <p>Valve Off Time: <span id="OffTime"></span></p>
+    </div>
+
+    <p><span id="user-uid"></span></p>
+  </div>
+<br><br>
+</main>
+
+<div>
+  <button id = "ww" class="waterNowBtn" >Water Now</button>
+</div>
+
+<div>
+  <button id = "aa" style="display: none;" class="waterNowBtn">Watering plant</button>
+</div>
+
+<div id="ss">
+  <p>Last watered: <span id="CurrentOnTime"></span></p>
+  <p id="currentTime" style="font-weight: bold;"></p>
+  <p>Last Data Recorded Time Stamp: <span id="Timestamp"></span></p>
+  <p id="currentTime" style="font-weight: bold;"></p>
+</div>
+
+<br><br>
+<h1>Product Recommendations</h1>
+	<div class="slider">
+		<div class="product">
+			<img src="img/product1.jpg" alt="Product 1">
+			<h2>Organic Fertilizer</h2>
+			<p>TrustBasket Organic Vermicompost Fertilizer Manure for Plants -20 kg</p>
+			<a href="https://www.amazon.in/Trust-basket-Organic-Vermicompost-Fertilizer/dp/B07PJLLVC5/ref=sr_1_17?keywords=fertilizer%2Bfor%2Bfarming&qid=1684055515&sprefix=fertilizer%2Bfor%2Bfarmi%2Caps%2C231&sr=8-17&th=1">Buy Now</a>
+		</div>
+		<div class="product">
+			<img src="img/product2.jpg" alt="Product 2">
+			<h2>Grass Cutter</h2>
+			<p>Generic Heavy Duty Petrol Back Pack Grass Cutter with Weeder Farming Garden and Agriculture Brush Cutter</p>
+			<a href="https://www.amazon.in/Generic-Petrol-Cutter-Farming-Agriculture/dp/B08H7ZMLC4/ref=sr_1_12?keywords=agriculture+tools+for+farming+weeder&qid=1684054870&sprefix=agriculture+tools+fo%2Caps%2C304&sr=8-12">Buy Now</a>
+		</div>
+		<div class="product">
+			<img src="img/product3.jpg" alt="Product 3">
+			<h2>Farming Sprayer</h2>
+			<p>Balwaan Krishi Bs-22 12 Volts X 12 Ampere Battery Sprayer | 20 Litre Tank Capacity | Knapsack Sprayer For Gardening, Farming & Sanitization</p>
+			<a href="https://www.amazon.in/Balwaan-Battery-Sprayer-Knapsack-Capacity/dp/B09XK5WRFG/ref=sr_1_2_sspa?crid=1IURF3GUPVGTE&keywords=agriculture+tools+for+farming+spray&qid=1684055204&sprefix=agriculture+tools+for+%2Caps%2C203&sr=8-2-spons&sp_csd=d2lkZ2V0TmFtZT1zcF9hdGY&psc=1&smid=AIXX4WUBN6SEA">Buy Now</a>
+		</div>
+		<div class="product">
+			<img src="img/product4.jpg" alt="Product 4">
+			<h2>Garden Rake</h2>
+			<p>WOLF-Garten multi-star Heavy Duty Garden Rake, Model DRM35</p>
+			<a href="https://www.amazon.in/WOLF-Garten-multi-star-Heavy-Garden-Model/dp/B01N6MBZMQ/ref=sr_1_17?keywords=agriculture+tools+for+farming+weeder&qid=1684054870&sprefix=agriculture+tools+fo%2Caps%2C304&sr=8-17">Buy Now</a>
+		</div>
+		<div class="product">
+			<img src="img/product5.jpg" alt="Product 5">
+			<h2>Spray Gun</h2>
+			<p>AquaHose 7 Function Water Spray Gun Set Green For Gardening Tools - Universal Fitting with Butterfly Clamp</p>
+			<a href="https://www.amazon.in/Balwaan-Battery-Sprayer-Knapsack-Capacity/dp/B09XK5WRFG/ref=sr_1_2_sspa?crid=1IURF3GUPVGTE&keywords=agriculture+tools+for+farming+spray&qid=1684055204&sprefix=agriculture+tools+for+%2Caps%2C203&sr=8-2-spons&sp_csd=d2lkZ2V0TmFtZT1zcF9hdGY&psc=1&smid=AIXX4WUBN6SEA">Buy Now</a>
+		</div>
+		<div class="product">
+			<img src="img/product6.jpg" alt="Product 6">
+			<h2>High Germination Seed</h2>
+			<p>Agrey 45 Varieties of Vegetable Seeds 2665+ High Germination Seeds For Your Garden With Instruction Manual</p>
+			<a href="https://www.amazon.in/Agrey-Varieties-Vegetable-Germination-Instruction/dp/B09299SQ44/ref=d_pb_allspark_purchase_sims_desktop_sccl_4_4/262-5741606-1367141?pd_rd_w=0mLsE&content-id=amzn1.sym.482ab84c-5d72-4d54-bbef-ece119e5156d&pf_rd_p=482ab84c-5d72-4d54-bbef-ece119e5156d&pf_rd_r=PS06WY0JMNBZKG5WSP0Q&pd_rd_wg=5Rsot&pd_rd_r=060235f3-f114-4134-901b-b332355381b8&pd_rd_i=B09299SQ44&psc=1">Buy Now</a>
+      </div>
+      <div class="product">
+        <img src="img/product7.jpg" alt="Product 6">
+        <h2>Fertilizer</h2>
+        <p>Ugaoo Pot-O-Mix Potting Soil with Fertilizer for Home Garden Plants - 5 kg</p>
+        <a href="https://www.amazon.in/Ugaoo-Potting-Fertilizer-Garden-Plants/dp/B0B313DMFW/ref=sr_1_2_sspa?keywords=fertilizer+for+farming&qid=1684055515&sprefix=fertilizer+for+farmi%2Caps%2C231&sr=8-2-spons&sp_csd=d2lkZ2V0TmFtZT1zcF9hdGY&psc=1">Buy Now</a>
+        </div>
+      
+<footer>All Rights Reserved @ SmartAgro 2023</footer>
+	<script src="js/script2.js"></script>
+	<!-- <script src="calender.js"></script> -->
+
+	<script src="https://code.jquery.com/jquery-1.12.4.min.js"
+		integrity="sha384-nvAa0+6Qg9clwYCGGPpDQLVpLNn0fRaROjHqs13t4Ggj3Ez50XnGQqc/r8MhnRDZ"
+		crossorigin="anonymous"></script>
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@3.4.1/dist/js/bootstrap.min.js"
+		integrity="sha384-aJ21OjlMXNL5UyIl/XNwTMqvzeRMZH2w8c5cRVpzpU8Y5bApTppSuUkhZXN0VxHd"
+		crossorigin="anonymous"></script>
+</body>
+</html>
