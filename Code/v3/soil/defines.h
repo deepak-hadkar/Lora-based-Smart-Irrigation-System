@@ -5,13 +5,13 @@
 #define FREQUENCY 434.0 // 868.0 // 915.0
 
 //SX1278::begin(434.0, 125.0, 9, 7, SX127X_SYNC_WORD, 10, 8, 0);
-#define BANDWIDTH 125.0
-#define SPREADING_FACTOR 9
-#define CODING_RATE 7
+#define BANDWIDTH 125.0 Narrow bandwidth for better sensitivity
+#define SPREADING_FACTOR 9 // should be 12 High spreading factor for maximum range
+#define CODING_RATE 7 // should be 5 Coding rate 4/5 for more error correction
 #define SX127X_SYNC_WORD 0x12
 #define OUTPUT_POWER 20
-#define PREAMBLE_LEN 8
-#define GAIN 0
+#define PREAMBLE_LEN 8 // should be 12 for max - Long preamble for better sync at distance
+#define GAIN 0 // required high gain antenna
 
 //328p
 #define DIO0 2
