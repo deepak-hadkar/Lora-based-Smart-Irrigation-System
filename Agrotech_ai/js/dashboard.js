@@ -3,6 +3,7 @@ let devices = {};
 let dashboardCfg = {};
 let catalog = {};
 let activeDevice = null;
+let activeDeviceOriginalCards = null;
 let didBootstrapCfg = false;
 let uiBound = false;
 let deviceDataPath = "";
@@ -10,12 +11,15 @@ let deviceDataPath = "";
 const ready = { devices: false, dashboard: false, catalog: false };
 const sortableByDevice = {};
 const CARD_TYPES = ["display", "toggle", "number-input"];
+const DEVICE_TYPES = ["sensor", "actuator"];
 const DASH_LANGUAGE_STORAGE_KEY = "smartagro_language";
 
 const DASH_I18N = {
   en: {
     dashboardTitle: "Dashboard",
     addDashboardDeviceBtn: "Add Device",
+    createCatalogCardBtn: "Create Card",
+    updateDashboardDeviceBtn: "Update Device",
     adminLoginRequired: "Admin login required",
     loadingTitle: "Loading dashboard...",
     loadingDesc: "Connecting to your data.",
@@ -24,6 +28,7 @@ const DASH_I18N = {
     nothingToShowTitle: "Nothing to show yet",
     nothingToShowDesc: "No renderable device cards are available.",
     customizeBtn: "Customize",
+    deleteDeviceSymbolTitle: "Delete Device",
     addLabel: "Add",
     updateLabel: "Update",
     selectOneCard: "Select at least one card.",
@@ -34,89 +39,190 @@ const DASH_I18N = {
     removeDeviceBtn: "Remove Device",
     customizeCancelBtn: "Cancel",
     customizeSaveBtn: "Save",
-    addDeviceModalTitle: "Add Device To Dashboard",
-    addDeviceLabel: "Device",
+    addDeviceModalTitle: "Create New Device",
+    addDeviceIdLabel: "New Device ID",
     addDeviceDisplayNameLabel: "Display Name (optional)",
     addDeviceTypeLabel: "Device Type",
     cardsToShowLabel: "Cards To Show",
+    createLabel: "Create",
+    updateDeviceModalTitle: "Update Device",
+    updateDeviceLabel: "Device",
+    openUpdateDeviceBtn: "Open",
+    updateDeviceCancelBtn: "Cancel",
+    createCardModalTitle: "Create New Card",
+    createCardKeyLabel: "Card Key",
+    createCardLabelLabel: "Card Label",
+    createCardTypeLabel: "Card Type",
+    createCardUnitLabel: "Unit (optional)",
+    createCardCancelBtn: "Cancel",
+    saveCreateCardBtn: "Create",
     addDeviceCancelBtn: "Cancel",
-    addDeviceEmptyMsg: "No available devices to add.",
     addDeviceNamePlaceholder: "Use custom dashboard name",
+    addDeviceIdPlaceholder: "Enter new device id",
+    deviceIdRequired: "Enter a new device ID.",
+    invalidDeviceId: "Invalid Device ID. Avoid . # $ [ ] / characters.",
+    cardKeyRequired: "Enter card key.",
+    invalidCardKey: "Invalid card key. Avoid . # $ [ ] / characters.",
+    deviceAlreadyExists: "Device ID already exists. Use Update Device to edit it.",
+    noDevicesToUpdate: "No devices available to update.",
     visibleLabel: "Visible",
     customCardNamePlaceholder: "Custom card name",
+    readModeLabel: "Read",
+    writeModeLabel: "Write",
+    buttonModeLabel: "Button",
+    noAddCardOptions: "No more cards available",
     removeLabel: "Remove",
     onLabel: "ON",
-    offLabel: "OFF"
+    offLabel: "OFF",
+    createCardKeyPlaceholder: "Example: Voltage",
+    createCardLabelPlaceholder: "Example: Battery Voltage",
+    createCardUnitPlaceholder: "Example: V",
+    deviceDefaultNamePrefix: "Device",
+    selectDeviceTypePlaceholder: "Select device type",
+    reorderCardAriaLabel: "Reorder card",
+    customizeTitlePrefix: "Customize",
+    deviceNameRequired: "Device name required",
+    dbPathLabel: "Data path"
   },
   hi: {
-    dashboardTitle: "डैशबोर्ड",
-    addDashboardDeviceBtn: "डिवाइस जोड़ें",
-    adminLoginRequired: "एडमिन लॉगिन आवश्यक है",
-    loadingTitle: "डैशबोर्ड लोड हो रहा है...",
-    loadingDesc: "आपके डेटा से कनेक्ट किया जा रहा है।",
-    noDevicesTitle: "कोई डिवाइस नहीं मिला",
-    noWidgetsNote: "इस डिवाइस के लिए अभी कोई विजेट उपलब्ध नहीं है।",
+    dashboardTitle: "नियंत्रण पटल",
+    addDashboardDeviceBtn: "उपकरण जोड़ें",
+    createCatalogCardBtn: "घटक बनाएं",
+    updateDashboardDeviceBtn: "उपकरण अद्यतन करें",
+    adminLoginRequired: "प्रशासक प्रवेश आवश्यक है",
+    loadingTitle: "नियंत्रण पटल लोड हो रहा है...",
+    loadingDesc: "आपके डेटा से जुड़ा जा रहा है।",
+    noDevicesTitle: "कोई उपकरण नहीं मिला",
+    noWidgetsNote: "इस उपकरण के लिए अभी कोई घटक उपलब्ध नहीं है।",
     nothingToShowTitle: "अभी दिखाने के लिए कुछ नहीं",
-    nothingToShowDesc: "दिखाने योग्य डिवाइस कार्ड उपलब्ध नहीं हैं।",
-    customizeBtn: "कस्टमाइज़",
+    nothingToShowDesc: "दिखाने योग्य उपकरण घटक उपलब्ध नहीं हैं।",
+    customizeBtn: "सानुकूलित करें",
+    deleteDeviceSymbolTitle: "उपकरण हटाएं",
     addLabel: "जोड़ें",
-    updateLabel: "अपडेट",
-    selectOneCard: "कम से कम एक कार्ड चुनें।",
-    customizeDeviceNameLabel: "डिवाइस नाम",
-    customizeDeviceTypeLabel: "डिवाइस प्रकार",
-    customizeAddCardLabel: "नया कार्ड जोड़ें",
-    addCardBtn: "कार्ड जोड़ें",
-    removeDeviceBtn: "डिवाइस हटाएं",
+    updateLabel: "अद्यतन करें",
+    selectOneCard: "कम से कम एक घटक चुनें।",
+    customizeDeviceNameLabel: "उपकरण नाम",
+    customizeDeviceTypeLabel: "उपकरण प्रकार",
+    customizeAddCardLabel: "नया घटक जोड़ें",
+    addCardBtn: "घटक जोड़ें",
+    removeDeviceBtn: "उपकरण हटाएं",
     customizeCancelBtn: "रद्द करें",
-    customizeSaveBtn: "सेव करें",
-    addDeviceModalTitle: "डैशबोर्ड में डिवाइस जोड़ें",
-    addDeviceLabel: "डिवाइस",
-    addDeviceDisplayNameLabel: "डिस्प्ले नाम (वैकल्पिक)",
-    addDeviceTypeLabel: "डिवाइस प्रकार",
-    cardsToShowLabel: "दिखाने वाले कार्ड",
+    customizeSaveBtn: "सहेजें",
+    addDeviceModalTitle: "नया उपकरण बनाएं",
+    addDeviceIdLabel: "नया उपकरण पहचान क्रमांक",
+    addDeviceDisplayNameLabel: "प्रदर्शित नाम (वैकल्पिक)",
+    addDeviceTypeLabel: "उपकरण प्रकार",
+    cardsToShowLabel: "दिखाने वाले घटक",
+    createLabel: "बनाएं",
+    updateDeviceModalTitle: "उपकरण अद्यतन करें",
+    updateDeviceLabel: "उपकरण",
+    openUpdateDeviceBtn: "खोलें",
+    updateDeviceCancelBtn: "रद्द करें",
+    createCardModalTitle: "नया घटक बनाएं",
+    createCardKeyLabel: "घटक कुंजी",
+    createCardLabelLabel: "घटक नाम",
+    createCardTypeLabel: "घटक प्रकार",
+    createCardUnitLabel: "इकाई (वैकल्पिक)",
+    createCardCancelBtn: "रद्द करें",
+    saveCreateCardBtn: "बनाएं",
     addDeviceCancelBtn: "रद्द करें",
-    addDeviceEmptyMsg: "जोड़ने के लिए कोई उपलब्ध डिवाइस नहीं है।",
-    addDeviceNamePlaceholder: "कस्टम डैशबोर्ड नाम उपयोग करें",
+    addDeviceNamePlaceholder: "नियंत्रण पटल के लिए मनचाहा नाम दें",
+    addDeviceIdPlaceholder: "नया उपकरण पहचान क्रमांक दर्ज करें",
+    deviceIdRequired: "कृपया नया उपकरण पहचान क्रमांक दर्ज करें।",
+    invalidDeviceId: "अमान्य उपकरण पहचान क्रमांक। . # $ [ ] / अक्षरों का उपयोग न करें।",
+    cardKeyRequired: "कृपया घटक कुंजी दर्ज करें।",
+    invalidCardKey: "अमान्य घटक कुंजी। . # $ [ ] / अक्षरों का उपयोग न करें।",
+    deviceAlreadyExists: "उपकरण पहचान क्रमांक पहले से मौजूद है। बदलने के लिए उपकरण अद्यतन करें का उपयोग करें।",
+    noDevicesToUpdate: "अद्यतन के लिए कोई उपकरण उपलब्ध नहीं है।",
     visibleLabel: "दिखाएं",
-    customCardNamePlaceholder: "कस्टम कार्ड नाम",
+    customCardNamePlaceholder: "मनचाहा घटक नाम",
+    readModeLabel: "पठन",
+    writeModeLabel: "लेखन",
+    buttonModeLabel: "बटन",
+    noAddCardOptions: "और घटक उपलब्ध नहीं हैं",
     removeLabel: "हटाएं",
     onLabel: "चालू",
-    offLabel: "बंद"
+    offLabel: "बंद",
+    createCardKeyPlaceholder: "उदाहरण: वोल्टेज",
+    createCardLabelPlaceholder: "उदाहरण: बैटरी वोल्टेज",
+    createCardUnitPlaceholder: "उदाहरण: वोल्ट",
+    deviceDefaultNamePrefix: "उपकरण",
+    selectDeviceTypePlaceholder: "उपकरण प्रकार चुनें",
+    reorderCardAriaLabel: "कार्ड क्रम बदलें",
+    customizeTitlePrefix: "सानुकूलित करें",
+    deviceNameRequired: "उपकरण नाम आवश्यक है",
+    dbPathLabel: "डेटा पथ"
   },
   mr: {
-    dashboardTitle: "डॅशबोर्ड",
-    addDashboardDeviceBtn: "डिव्हाइस जोडा",
-    adminLoginRequired: "अ‍ॅडमिन लॉगिन आवश्यक आहे",
-    loadingTitle: "डॅशबोर्ड लोड होत आहे...",
-    loadingDesc: "तुमच्या डेटाशी कनेक्ट करत आहे.",
-    noDevicesTitle: "कोणतेही डिव्हाइस सापडले नाही",
-    noWidgetsNote: "या डिव्हाइससाठी सध्या कोणतेही विजेट उपलब्ध नाहीत.",
+    dashboardTitle: "नियंत्रण फलक",
+    addDashboardDeviceBtn: "साधन जोडा",
+    createCatalogCardBtn: "घटक तयार करा",
+    updateDashboardDeviceBtn: "साधन अद्यतनित करा",
+    adminLoginRequired: "प्रशासक प्रवेश आवश्यक आहे",
+    loadingTitle: "नियंत्रण फलक लोड होत आहे...",
+    loadingDesc: "तुमच्या डेटाशी जोडले जात आहे.",
+    noDevicesTitle: "कोणतेही साधन सापडले नाही",
+    noWidgetsNote: "या साधनासाठी सध्या कोणतेही घटक उपलब्ध नाहीत.",
     nothingToShowTitle: "दाखवण्यासाठी काहीही नाही",
-    nothingToShowDesc: "दाखवण्यायोग्य डिव्हाइस कार्ड उपलब्ध नाहीत.",
-    customizeBtn: "कस्टमाइझ",
+    nothingToShowDesc: "दाखवण्यायोग्य साधन घटक उपलब्ध नाहीत.",
+    customizeBtn: "सानुकूलित करा",
+    deleteDeviceSymbolTitle: "साधन काढा",
     addLabel: "जोडा",
-    updateLabel: "अपडेट",
-    selectOneCard: "किमान एक कार्ड निवडा.",
-    customizeDeviceNameLabel: "डिव्हाइस नाव",
-    customizeDeviceTypeLabel: "डिव्हाइस प्रकार",
-    customizeAddCardLabel: "नवे कार्ड जोडा",
-    addCardBtn: "कार्ड जोडा",
-    removeDeviceBtn: "डिव्हाइस काढा",
+    updateLabel: "अद्यतन करा",
+    selectOneCard: "किमान एक घटक निवडा.",
+    customizeDeviceNameLabel: "साधन नाव",
+    customizeDeviceTypeLabel: "साधन प्रकार",
+    customizeAddCardLabel: "नवा घटक जोडा",
+    addCardBtn: "घटक जोडा",
+    removeDeviceBtn: "साधन काढा",
     customizeCancelBtn: "रद्द करा",
-    customizeSaveBtn: "सेव्ह करा",
-    addDeviceModalTitle: "डॅशबोर्डमध्ये डिव्हाइस जोडा",
-    addDeviceLabel: "डिव्हाइस",
-    addDeviceDisplayNameLabel: "डिस्प्ले नाव (पर्यायी)",
-    addDeviceTypeLabel: "डिव्हाइस प्रकार",
-    cardsToShowLabel: "दाखवायची कार्डे",
+    customizeSaveBtn: "जतन करा",
+    addDeviceModalTitle: "नवीन साधन तयार करा",
+    addDeviceIdLabel: "नवीन साधन ओळख क्रमांक",
+    addDeviceDisplayNameLabel: "प्रदर्शित नाव (पर्यायी)",
+    addDeviceTypeLabel: "साधन प्रकार",
+    cardsToShowLabel: "दाखवायचे घटक",
+    createLabel: "तयार करा",
+    updateDeviceModalTitle: "साधन अद्यतनित करा",
+    updateDeviceLabel: "साधन",
+    openUpdateDeviceBtn: "उघडा",
+    updateDeviceCancelBtn: "रद्द करा",
+    createCardModalTitle: "नवीन घटक तयार करा",
+    createCardKeyLabel: "घटक कळी",
+    createCardLabelLabel: "घटक नाव",
+    createCardTypeLabel: "घटक प्रकार",
+    createCardUnitLabel: "एकक (पर्यायी)",
+    createCardCancelBtn: "रद्द करा",
+    saveCreateCardBtn: "तयार करा",
     addDeviceCancelBtn: "रद्द करा",
-    addDeviceEmptyMsg: "जोडण्यासाठी उपलब्ध डिव्हाइस नाहीत.",
-    addDeviceNamePlaceholder: "कस्टम डॅशबोर्ड नाव वापरा",
+    addDeviceNamePlaceholder: "नियंत्रण फलकासाठी सानुकूल नाव वापरा",
+    addDeviceIdPlaceholder: "नवीन साधन ओळख क्रमांक टाका",
+    deviceIdRequired: "कृपया नवीन साधन ओळख क्रमांक टाका.",
+    invalidDeviceId: "अवैध साधन ओळख क्रमांक. . # $ [ ] / अक्षरे टाळा.",
+    cardKeyRequired: "कृपया घटक कळी टाका.",
+    invalidCardKey: "अवैध घटक कळी. . # $ [ ] / अक्षरे टाळा.",
+    deviceAlreadyExists: "साधन ओळख क्रमांक आधीच अस्तित्वात आहे. बदलासाठी साधन अद्यतनित करा वापरा.",
+    noDevicesToUpdate: "अद्यतनासाठी कोणतेही साधन उपलब्ध नाही.",
     visibleLabel: "दृश्यमान",
-    customCardNamePlaceholder: "कस्टम कार्ड नाव",
+    customCardNamePlaceholder: "सानुकूल घटक नाव",
+    sensorTypeLabel: "संवेदक",
+    actuatorTypeLabel: "संचालक",
+    readModeLabel: "वाचा",
+    writeModeLabel: "लिहा",
+    buttonModeLabel: "बटण",
+    noAddCardOptions: "आणखी घटक उपलब्ध नाहीत",
     removeLabel: "काढा",
     onLabel: "चालू",
-    offLabel: "बंद"
+    offLabel: "बंद",
+    createCardKeyPlaceholder: "उदा.: व्होल्टेज",
+    createCardLabelPlaceholder: "उदा.: बॅटरी व्होल्टेज",
+    createCardUnitPlaceholder: "उदा.: व्होल्ट",
+    deviceDefaultNamePrefix: "साधन",
+    selectDeviceTypePlaceholder: "साधन प्रकार निवडा",
+    reorderCardAriaLabel: "कार्ड क्रम बदला",
+    customizeTitlePrefix: "सानुकूलित करा",
+    deviceNameRequired: "साधन नाव आवश्यक आहे",
+    dbPathLabel: "डेटा मार्ग"
   }
 };
 
@@ -158,12 +264,12 @@ const CARD_TITLE_I18N = {
     humidity: "आर्द्रता",
     moisture: "माती आर्द्रता",
     moisturethreshold: "आर्द्रता मर्यादा",
-    status: "वाल्व",
+    status: "स्थिती",
     flow: "प्रवाह",
     pressure: "दाब",
     threshold: "मर्यादा",
     battery: "बॅटरी",
-    control: "वाल्व नियंत्रण",
+    control: "नळ नियंत्रण",
     ontime: "चालू वेळ",
     offtime: "बंद वेळ",
     highthreshold: "वरची मर्यादा",
@@ -179,6 +285,25 @@ function getDashLang() {
 function tDash(key) {
   const lang = getDashLang();
   return (DASH_I18N[lang] && DASH_I18N[lang][key]) || DASH_I18N.en[key] || key;
+}
+
+function getCardTypeLabel(type) {
+  if (type === "display") return tDash("readModeLabel");
+  if (type === "number-input") return tDash("writeModeLabel");
+  if (type === "toggle") return tDash("buttonModeLabel");
+  return humanize(type);
+}
+
+function getDeviceTypeLabel(type) {
+  if (type === "sensor") {
+    const label = tDash("sensorTypeLabel");
+    return label === "sensorTypeLabel" ? humanize(type) : label;
+  }
+  if (type === "actuator") {
+    const label = tDash("actuatorTypeLabel");
+    return label === "actuatorTypeLabel" ? humanize(type) : label;
+  }
+  return humanize(type);
 }
 
 function localizeDashDigits(text) {
@@ -224,11 +349,21 @@ function canEditDashboard() {
 function applyEditLockUi() {
   const unlocked = canEditDashboard();
   const addBtn = document.getElementById("addDashboardDeviceBtn");
+  const createCardBtn = document.getElementById("createCatalogCardBtn");
+  const updateBtn = document.getElementById("updateDashboardDeviceBtn");
   const toggles = document.getElementById("deviceToggles");
 
   if (addBtn) {
     addBtn.disabled = !unlocked;
     addBtn.title = unlocked ? "" : tDash("adminLoginRequired");
+  }
+  if (updateBtn) {
+    updateBtn.disabled = !unlocked;
+    updateBtn.title = unlocked ? "" : tDash("adminLoginRequired");
+  }
+  if (createCardBtn) {
+    createCardBtn.disabled = !unlocked;
+    createCardBtn.title = unlocked ? "" : tDash("adminLoginRequired");
   }
   if (toggles) toggles.classList.toggle("hide", !unlocked);
 }
@@ -244,6 +379,8 @@ function applyDashboardLanguage() {
   const keys = [
     "dashboardTitle",
     "addDashboardDeviceBtn",
+    "createCatalogCardBtn",
+    "updateDashboardDeviceBtn",
     "customizeDeviceNameLabel",
     "customizeDeviceTypeLabel",
     "customizeAddCardLabel",
@@ -252,12 +389,22 @@ function applyDashboardLanguage() {
     "customizeCancelBtn",
     "customizeSaveBtn",
     "addDeviceModalTitle",
-    "addDeviceLabel",
+    "addDeviceIdLabel",
     "addDeviceDisplayNameLabel",
     "addDeviceTypeLabel",
     "cardsToShowLabel",
     "addDeviceCancelBtn",
-    "addDeviceEmptyMsg"
+    "updateDeviceModalTitle",
+    "updateDeviceLabel",
+    "openUpdateDeviceBtn",
+    "updateDeviceCancelBtn",
+    "createCardModalTitle",
+    "createCardKeyLabel",
+    "createCardLabelLabel",
+    "createCardTypeLabel",
+    "createCardUnitLabel",
+    "createCardCancelBtn",
+    "saveCreateCardBtn"
   ];
 
   keys.forEach(id => {
@@ -267,6 +414,61 @@ function applyDashboardLanguage() {
 
   const nameInput = document.getElementById("addDeviceNameInput");
   if (nameInput) nameInput.placeholder = tDash("addDeviceNamePlaceholder");
+
+  const idInput = document.getElementById("addDeviceIdInput");
+  if (idInput) idInput.placeholder = tDash("addDeviceIdPlaceholder");
+
+  const createCardKeyInput = document.getElementById("createCardKeyInput");
+  if (createCardKeyInput) createCardKeyInput.placeholder = tDash("createCardKeyPlaceholder");
+
+  const createCardLabelInput = document.getElementById("createCardLabelInput");
+  if (createCardLabelInput) createCardLabelInput.placeholder = tDash("createCardLabelPlaceholder");
+
+  const createCardUnitInput = document.getElementById("createCardUnitInput");
+  if (createCardUnitInput) createCardUnitInput.placeholder = tDash("createCardUnitPlaceholder");
+}
+
+function getDefaultDeviceName(id) {
+  return `${tDash("deviceDefaultNamePrefix")} ${id}`;
+}
+
+function localizeDeviceNameTerms(text, lang) {
+  const source = String(text || "");
+  if (lang === "hi") {
+    return source
+      .replace(/device/gi, "उपकरण")
+      .replace(/sensor/gi, "संवेदक")
+      .replace(/actuator/gi, "संचालक")
+      .replace(/valve/gi, "वाल्व")
+      .replace(/status/gi, "स्थिति");
+  }
+
+  if (lang === "mr") {
+    return source
+      .replace(/device/gi, "साधन")
+      .replace(/sensor/gi, "संवेदक")
+      .replace(/actuator/gi, "संचालक")
+      .replace(/valve/gi, "नळ")
+      .replace(/status/gi, "स्थिती")
+      .replace(/यंत्र/g, "साधन");
+  }
+
+  return source;
+}
+
+function resolveDeviceNameForLang(id, storedName) {
+  const lang = getDashLang();
+  const current = String(storedName || "").trim();
+  if (!current) return localizeDeviceNameTerms(getDefaultDeviceName(id), lang);
+
+  const normalized = current.toLowerCase();
+  const suffix = String(id || "").toLowerCase();
+  const legacyPrefixes = ["device", "उपकरण", "साधन", "यंत्र"];
+
+  const isDefaultLike = legacyPrefixes.some(prefix => normalized === `${prefix} ${suffix}`);
+  if (isDefaultLike) return localizeDeviceNameTerms(getDefaultDeviceName(id), lang);
+
+  return localizeDeviceNameTerms(current, lang);
 }
 
 if (document.readyState === "loading") {
@@ -276,20 +478,23 @@ if (document.readyState === "loading") {
 }
 
 const DEFAULT_CATALOG = {
-  soil_sensor: {
-    Temperature: { label: "Temperature", type: "display", unit: "degC", icon: "" },
-    Humidity: { label: "Humidity", type: "display", unit: "%", icon: "" },
-    Moisture: { label: "Soil Moisture", type: "display", unit: "%", icon: "" },
-    MoistureThreshold: { label: "Moisture Threshold", type: "number-input", unit: "%", icon: "" }
-  },
-  valve: {
-    status: { label: "Valve", type: "toggle", unit: "", icon: "" },
-    flow: { label: "Flow", type: "display", unit: "L/min", icon: "" },
-    pressure: { label: "Pressure", type: "display", unit: "kPa", icon: "" },
-    threshold: { label: "Threshold", type: "number-input", unit: "", icon: "" }
-  },
-  generic: {}
+  Temperature: { label: "Temperature", type: "display", unit: "degC", icon: "" },
+  Humidity: { label: "Humidity", type: "display", unit: "%", icon: "" },
+  Moisture: { label: "Soil Moisture", type: "display", unit: "%", icon: "" },
+  MoistureThreshold: { label: "Moisture Threshold", type: "number-input", unit: "%", icon: "" },
+  LowThreshold: { label: "Low Threshold", type: "number-input", unit: "", icon: "" },
+  status: { label: "Valve", type: "toggle", unit: "", icon: "" },
+  flow: { label: "Flow", type: "display", unit: "L/min", icon: "" },
+  pressure: { label: "Pressure", type: "display", unit: "kPa", icon: "" },
+  threshold: { label: "Threshold", type: "number-input", unit: "", icon: "" }
 };
+
+function normalizeDeviceType(type) {
+  const t = String(type || "").toLowerCase().trim();
+  if (t === "soil_sensor" || t === "soil" || t === "sensor") return "sensor";
+  if (t === "valve" || t === "actuator") return "actuator";
+  return "sensor";
+}
 
 function isPlainObject(v) {
   return v && typeof v === "object" && !Array.isArray(v);
@@ -370,6 +575,25 @@ async function subscribeDevices() {
 }
 
 async function bootstrapNewUserData() {
+  const existingPaths = [
+    `user/${uid}/devices`,
+    `users/${uid}/devices`,
+    `user/${uid}/dashboard/devices`,
+    `users/${uid}/dashboard/devices`
+  ];
+
+  for (const path of existingPaths) {
+    try {
+      const snap = await db.ref(path).once("value");
+      const val = snap.val();
+      if (val && typeof val === "object" && Object.keys(val).length > 0) {
+        return;
+      }
+    } catch (err) {
+      console.warn("bootstrap existing-data probe failed for", path, err && err.message);
+    }
+  }
+
   const initRef = db.ref(`user/${uid}/_meta/initialized`);
   let isNewUser = false;
 
@@ -391,31 +615,9 @@ async function bootstrapNewUserData() {
   const email = (firebase.auth().currentUser && firebase.auth().currentUser.email) || "";
   const defaultName = email ? email.split("@")[0] : "New User";
 
-  const starterDevice = {
-    name: "Starter Valve",
-    type: "valve",
-    status: 0,
-    flow: 0,
-    pressure: 0,
-    threshold: 50
-  };
-
-  const starterLayout = {
-    name: "Starter Valve",
-    type: "valve",
-    visible: true,
-    cards: {
-      status: { visible: true, order: 1, label: "Valve", type: "toggle", unit: "", icon: "" },
-      flow: { visible: true, order: 2, label: "Flow", type: "display", unit: "L/min", icon: "" },
-      threshold: { visible: true, order: 3, label: "Threshold", type: "number-input", unit: "", icon: "" }
-    }
-  };
-
   const updates = {};
   updates[`user/${uid}/profile/name`] = defaultName;
   updates[`user/${uid}/profile/email`] = email;
-  updates[`user/${uid}/devices/device1`] = starterDevice;
-  updates[`user/${uid}/dashboard/devices/device1`] = starterLayout;
 
   try {
     await db.ref().update(updates);
@@ -499,11 +701,22 @@ function bindUiEventsOnce() {
   const addBtn = document.getElementById("addDashboardDeviceBtn");
   if (addBtn) addBtn.addEventListener("click", openAddDeviceModal);
 
-  const addDeviceSelect = document.getElementById("addDeviceSelect");
-  if (addDeviceSelect) addDeviceSelect.addEventListener("change", renderAddDeviceCardChoices);
+  const createCardBtn = document.getElementById("createCatalogCardBtn");
+  if (createCardBtn) createCardBtn.addEventListener("click", openCreateCardModal);
+
+  const updateBtn = document.getElementById("updateDashboardDeviceBtn");
+  if (updateBtn) updateBtn.addEventListener("click", openUpdateDeviceModal);
+
+  const addDeviceIdInput = document.getElementById("addDeviceIdInput");
+  if (addDeviceIdInput) addDeviceIdInput.addEventListener("input", syncCreateSaveButtonState);
 
   const addDeviceTypeSelect = document.getElementById("addDeviceTypeSelect");
-  if (addDeviceTypeSelect) addDeviceTypeSelect.addEventListener("change", renderAddDeviceCardChoices);
+  if (addDeviceTypeSelect) {
+    addDeviceTypeSelect.addEventListener("change", () => {
+      renderAddDeviceCardChoices();
+      syncCreateSaveButtonState();
+    });
+  }
 
   const deviceTypeInput = document.getElementById("deviceTypeInput");
   if (deviceTypeInput) {
@@ -529,25 +742,68 @@ function tryRender() {
 }
 
 function mergeCatalog(customCatalog) {
-  return {
-    ...DEFAULT_CATALOG,
-    ...customCatalog,
-    soil_sensor: { ...DEFAULT_CATALOG.soil_sensor, ...(customCatalog.soil_sensor || {}) },
-    valve: { ...DEFAULT_CATALOG.valve, ...(customCatalog.valve || {}) },
-    generic: { ...DEFAULT_CATALOG.generic, ...(customCatalog.generic || {}) }
+  const legacyTypeBuckets = ["sensor", "actuator", "generic", "soil_sensor", "valve"];
+  const fromLegacy = {};
+  legacyTypeBuckets.forEach(bucket => {
+    const group = customCatalog[bucket];
+    if (!group || typeof group !== "object" || Array.isArray(group)) return;
+    Object.assign(fromLegacy, group);
+  });
+
+  const fromFlat = {};
+  Object.entries(customCatalog || {}).forEach(([key, value]) => {
+    if (legacyTypeBuckets.includes(key)) return;
+    if (!value || typeof value !== "object" || Array.isArray(value)) return;
+    const looksLikeMeta = ("label" in value) || ("type" in value) || ("unit" in value) || ("icon" in value);
+    if (!looksLikeMeta) return;
+    fromFlat[key] = value;
+  });
+
+  const merged = {
+    ...fromLegacy,
+    ...fromFlat
   };
+
+  return Object.keys(merged).length ? merged : { ...DEFAULT_CATALOG };
 }
 
 function ensureDashboardConfig() {
-  if (Object.keys(dashboardCfg).length > 0) return;
-  if (didBootstrapCfg) return;
+  const deviceEntries = Object.entries(devices || {});
 
-  didBootstrapCfg = true;
-  const inferred = buildDashboardFromDevices();
-  if (Object.keys(inferred).length === 0) return;
+  if (Object.keys(dashboardCfg).length === 0 && !didBootstrapCfg) {
+    if (deviceEntries.length === 0) return;
+    didBootstrapCfg = true;
+    const inferred = buildDashboardFromDevices();
+    if (Object.keys(inferred).length === 0) return;
 
-  dashboardCfg = inferred;
-  db.ref(`user/${uid}/dashboard/devices`).set(inferred);
+    dashboardCfg = inferred;
+    db.ref(`user/${uid}/dashboard/devices`).set(inferred);
+    return;
+  }
+
+  const deviceIds = new Set(deviceEntries.map(([id]) => id));
+  const missing = {};
+  deviceEntries.forEach(([id, device]) => {
+    if (!dashboardCfg[id]) {
+      missing[id] = createDashboardDeviceConfig(id, device);
+    }
+  });
+
+  const staleIds = Object.keys(dashboardCfg || {}).filter(id => !deviceIds.has(id));
+  if (Object.keys(missing).length === 0 && staleIds.length === 0) return;
+
+  const updates = { ...missing };
+  staleIds.forEach(id => {
+    updates[id] = null;
+  });
+
+  const nextCfg = { ...dashboardCfg, ...missing };
+  staleIds.forEach(id => {
+    delete nextCfg[id];
+  });
+
+  dashboardCfg = nextCfg;
+  db.ref(`user/${uid}/dashboard/devices`).update(updates);
 }
 
 function buildDashboardFromDevices() {
@@ -559,14 +815,13 @@ function buildDashboardFromDevices() {
 }
 
 function inferDeviceType(device) {
-  const declared = (device?.type || "").toLowerCase();
-  if (declared.includes("soil")) return "soil_sensor";
-  if (declared.includes("valve")) return "valve";
+  const declaredRaw = String(device?.type || "").trim();
+  if (declaredRaw) return normalizeDeviceType(declaredRaw);
 
   const keys = getMetricKeysFromDevice(device).map(k => k.toLowerCase());
-  if (keys.some(k => k.includes("temperature") || k.includes("humidity") || k.includes("moisture"))) return "soil_sensor";
-  if (keys.some(k => k.includes("status") || k.includes("valve") || k.includes("pump") || k.includes("relay"))) return "valve";
-  return "generic";
+  if (keys.some(k => k.includes("temperature") || k.includes("humidity") || k.includes("moisture"))) return "sensor";
+  if (keys.some(k => k.includes("status") || k.includes("valve") || k.includes("pump") || k.includes("relay"))) return "actuator";
+  return "sensor";
 }
 
 function inferMetaFromKey(key) {
@@ -590,32 +845,25 @@ function inferMetaFromKey(key) {
 }
 
 function getTypeCatalogForDevice(type, device) {
-  const byType = catalog[type] || {};
-  if (Object.keys(byType).length) return byType;
-
-  const derived = {};
-  getMetricKeysFromDevice(device).forEach(key => {
-    derived[key] = inferMetaFromKey(key);
-  });
-  return derived;
+  return catalog || {};
 }
 
 function populateDeviceTypeOptions(selectEl) {
   if (!selectEl) return;
-  const types = [...new Set([...Object.keys(DEFAULT_CATALOG), ...Object.keys(catalog || {})])];
+  const types = DEVICE_TYPES;
   selectEl.innerHTML = "";
   types.forEach(type => {
     const opt = document.createElement("option");
     opt.value = type;
-    opt.textContent = humanize(type);
+    opt.textContent = getDeviceTypeLabel(type);
     selectEl.appendChild(opt);
   });
 }
 
 function createDashboardDeviceConfig(id, device, options = {}) {
-  const selectedType = options.type || inferDeviceType(device);
+  const selectedType = normalizeDeviceType(options.type || inferDeviceType(device));
   const typeCatalog = getTypeCatalogForDevice(selectedType, device);
-  const allKeys = Object.keys(typeCatalog).length ? Object.keys(typeCatalog) : getMetricKeysFromDevice(device);
+  const allKeys = Object.keys(typeCatalog);
   const selectedKeys = (options.selectedKeys && options.selectedKeys.length) ? options.selectedKeys : allKeys;
 
   const cards = {};
@@ -632,72 +880,236 @@ function createDashboardDeviceConfig(id, device, options = {}) {
   });
 
   return {
-    name: options.customName || device?.name || `Device ${id}`,
+    name: options.customName || device?.name || getDefaultDeviceName(id),
     type: selectedType,
     visible: true,
     cards
   };
 }
 
-function openAddDeviceModal() {
-  if (!canEditDashboard()) return;
+function createDevicePayloadByType(id, type, customName) {
+  const safeType = normalizeDeviceType(type || "sensor");
+  const safeName = customName || getDefaultDeviceName(id);
 
-  const modal = document.getElementById("addDeviceModal");
-  const select = document.getElementById("addDeviceSelect");
-  const typeSelect = document.getElementById("addDeviceTypeSelect");
-  const emptyMsg = document.getElementById("addDeviceEmptyMsg");
-  const saveBtn = document.getElementById("saveAddDeviceBtn");
-  const nameInput = document.getElementById("addDeviceNameInput");
+  if (safeType === "sensor") {
+    return {
+      name: safeName,
+      type: safeType,
+      Temperature: 0,
+      Humidity: 0,
+      Moisture: 0,
+      MoistureThreshold: 50
+    };
+  }
 
-  if (!modal || !select || !typeSelect) return;
+  if (safeType === "actuator") {
+    return {
+      name: safeName,
+      type: safeType,
+      status: 0,
+      flow: 0,
+      pressure: 0,
+      threshold: 50
+    };
+  }
 
-  if (nameInput) nameInput.value = "";
-  populateDeviceTypeOptions(typeSelect);
-  select.innerHTML = "";
+  return {
+    name: safeName,
+    type: safeType
+  };
+}
 
-  const available = Object.entries(devices || {});
-  available.forEach(([id, device]) => {
-    const opt = document.createElement("option");
-    opt.value = id;
-    opt.textContent = dashboardCfg[id]
-      ? `${device?.name || id} (${id}) - on dashboard`
-      : `${device?.name || id} (${id})`;
-    select.appendChild(opt);
+async function upsertDeviceInDb(id, type, customName) {
+  const existing = devices[id];
+  let payload;
+
+  if (existing && typeof existing === "object") {
+    payload = {
+      ...existing,
+      name: customName || existing.name || getDefaultDeviceName(id),
+      type: type || existing.type || inferDeviceType(existing)
+    };
+  } else {
+    payload = createDevicePayloadByType(id, type, customName);
+  }
+
+  await db.ref(`${deviceDataPath}/${id}`).set(payload);
+  devices[id] = payload;
+  return payload;
+}
+
+function buildSelectedDevicePayload(id, type, customName, selectedKeys) {
+  const base = createDevicePayloadByType(id, type, customName);
+  const payload = {
+    name: base.name,
+    type: base.type
+  };
+
+  (selectedKeys || []).forEach(key => {
+    if (Object.prototype.hasOwnProperty.call(base, key)) {
+      payload[key] = base[key];
+      return;
+    }
+
+    const meta = (catalog && catalog[key]) || inferMetaFromKey(key);
+    if (meta.type === "toggle") {
+      payload[key] = 0;
+      return;
+    }
+    if (meta.type === "number-input") {
+      payload[key] = key.toLowerCase().includes("threshold") ? 50 : 0;
+      return;
+    }
+    payload[key] = 0;
   });
 
-  const noAvailable = available.length === 0;
-  if (emptyMsg) emptyMsg.classList.toggle("hide", !noAvailable);
-  select.disabled = noAvailable;
-  typeSelect.disabled = noAvailable;
-  if (saveBtn) {
-    saveBtn.disabled = noAvailable;
-    saveBtn.textContent = (select.value && dashboardCfg[select.value]) ? tDash("updateLabel") : tDash("addLabel");
-  }
+  return payload;
+}
 
-  if (!noAvailable) {
-    typeSelect.value = inferDeviceType(devices[select.value]);
-    renderAddDeviceCardChoices();
-  } else {
-    const box = document.getElementById("addDeviceCardChoices");
-    if (box) box.innerHTML = "";
-  }
+async function createDeviceInDb(id, type, customName, selectedKeys) {
+  const payload = buildSelectedDevicePayload(id, type, customName, selectedKeys);
+  await db.ref(`${deviceDataPath}/${id}`).set(payload);
+  devices[id] = payload;
+  return payload;
+}
+
+function openCreateCardModal() {
+  if (!canEditDashboard()) return;
+
+  const modal = document.getElementById("createCardModal");
+  const keyInput = document.getElementById("createCardKeyInput");
+  const labelInput = document.getElementById("createCardLabelInput");
+  const typeSelect = document.getElementById("createCardTypeSelect");
+  const unitInput = document.getElementById("createCardUnitInput");
+
+  if (!modal || !keyInput || !labelInput || !typeSelect || !unitInput) return;
+
+  keyInput.value = "";
+  labelInput.value = "";
+  unitInput.value = "";
+  typeSelect.innerHTML = "";
+  CARD_TYPES.forEach(mode => {
+    const opt = document.createElement("option");
+    opt.value = mode;
+    opt.textContent = getCardTypeLabel(mode);
+    typeSelect.appendChild(opt);
+  });
+  typeSelect.value = "display";
 
   modal.classList.remove("hide");
 }
 
-function renderAddDeviceCardChoices() {
-  const deviceSelect = document.getElementById("addDeviceSelect");
+function closeCreateCardModal() {
+  const modal = document.getElementById("createCardModal");
+  if (modal) modal.classList.add("hide");
+}
+
+async function saveCreateCardToCatalog() {
+  if (!canEditDashboard()) return;
+
+  const keyInput = document.getElementById("createCardKeyInput");
+  const labelInput = document.getElementById("createCardLabelInput");
+  const typeSelect = document.getElementById("createCardTypeSelect");
+  const unitInput = document.getElementById("createCardUnitInput");
+  if (!keyInput || !labelInput || !typeSelect || !unitInput) return;
+
+  const key = keyInput.value.trim();
+  if (!key) return alert(tDash("cardKeyRequired"));
+  if (/[.#$\[\]/]/.test(key)) return alert(tDash("invalidCardKey"));
+
+  const label = labelInput.value.trim() || humanize(key);
+  const type = typeSelect.value || "display";
+  const unit = unitInput.value.trim();
+
+  const payload = {
+    label,
+    type,
+    unit,
+    icon: ""
+  };
+
+  await db.ref(`user/${uid}/catalog/${key}`).update(payload);
+
+  if (!catalog) catalog = {};
+  catalog[key] = {
+    ...(catalog[key] || {}),
+    ...payload
+  };
+
+  const addDeviceModal = document.getElementById("addDeviceModal");
+  if (addDeviceModal && !addDeviceModal.classList.contains("hide")) {
+    renderAddDeviceCardChoices();
+  }
+  if (activeDevice) {
+    populateAddCardSelect(activeDevice);
+  }
+
+  closeCreateCardModal();
+}
+
+function openAddDeviceModal() {
+  if (!canEditDashboard()) return;
+
+  const modal = document.getElementById("addDeviceModal");
   const typeSelect = document.getElementById("addDeviceTypeSelect");
-  const box = document.getElementById("addDeviceCardChoices");
   const saveBtn = document.getElementById("saveAddDeviceBtn");
-  if (!deviceSelect || !typeSelect || !box || !deviceSelect.value) return;
+  const nameInput = document.getElementById("addDeviceNameInput");
+  const idInput = document.getElementById("addDeviceIdInput");
 
-  if (saveBtn) saveBtn.textContent = dashboardCfg[deviceSelect.value] ? tDash("updateLabel") : tDash("addLabel");
+  if (!modal || !typeSelect) return;
 
-  const device = devices[deviceSelect.value] || {};
-  const type = typeSelect.value || inferDeviceType(device);
+  if (nameInput) nameInput.value = "";
+  if (idInput) idInput.value = "";
+  populateDeviceTypeOptions(typeSelect);
+
+  const placeholder = document.createElement("option");
+  placeholder.value = "";
+  placeholder.textContent = tDash("selectDeviceTypePlaceholder");
+  typeSelect.insertBefore(placeholder, typeSelect.firstChild);
+
+  typeSelect.disabled = false;
+  if (saveBtn) {
+    saveBtn.disabled = false;
+    saveBtn.textContent = tDash("createLabel");
+  }
+
+  typeSelect.value = "";
+  renderAddDeviceCardChoices();
+  syncCreateSaveButtonState();
+
+  modal.classList.remove("hide");
+}
+
+function syncCreateSaveButtonState() {
+  const idInput = document.getElementById("addDeviceIdInput");
+  const typeSelect = document.getElementById("addDeviceTypeSelect");
+  const saveBtn = document.getElementById("saveAddDeviceBtn");
+  if (!saveBtn) return;
+  const id = (idInput && idInput.value ? idInput.value.trim() : "");
+  const hasType = !!(typeSelect && typeSelect.value);
+  saveBtn.disabled = !id || !hasType;
+  saveBtn.textContent = tDash("createLabel");
+}
+
+function renderAddDeviceCardChoices() {
+  const typeSelect = document.getElementById("addDeviceTypeSelect");
+  const label = document.getElementById("cardsToShowLabel");
+  const box = document.getElementById("addDeviceCardChoices");
+  if (!typeSelect || !box) return;
+
+  if (!typeSelect.value) {
+    box.innerHTML = "";
+    box.style.display = "none";
+    if (label) label.style.display = "none";
+    return;
+  }
+
+  const type = typeSelect.value;
+  const device = {};
   const entries = Object.entries(getTypeCatalogForDevice(type, device));
 
+  box.style.display = "grid";
+  if (label) label.style.display = "block";
   box.innerHTML = "";
   entries.forEach(([key, meta]) => {
     const row = document.createElement("label");
@@ -721,23 +1133,68 @@ function closeAddDeviceModal() {
   if (modal) modal.classList.add("hide");
 }
 
+function openUpdateDeviceModal() {
+  if (!canEditDashboard()) return;
+
+  const modal = document.getElementById("updateDeviceModal");
+  const select = document.getElementById("updateDeviceSelect");
+  const openBtn = document.getElementById("openUpdateDeviceBtn");
+  if (!modal || !select || !openBtn) return;
+
+  const entries = Object.entries(dashboardCfg || {});
+  select.innerHTML = "";
+  entries.forEach(([id, cfg]) => {
+    const opt = document.createElement("option");
+    opt.value = id;
+    opt.textContent = `${resolveDeviceNameForLang(id, cfg?.name)} (${id})`;
+    select.appendChild(opt);
+  });
+
+  openBtn.disabled = entries.length === 0;
+  if (entries.length === 0) {
+    alert(tDash("noDevicesToUpdate"));
+    return;
+  }
+
+  modal.classList.remove("hide");
+}
+
+function closeUpdateDeviceModal() {
+  const modal = document.getElementById("updateDeviceModal");
+  if (modal) modal.classList.add("hide");
+}
+
+function openSelectedDeviceCustomize() {
+  const select = document.getElementById("updateDeviceSelect");
+  if (!select || !select.value) return;
+  closeUpdateDeviceModal();
+  openCustomize(select.value);
+}
+
 async function saveAddDevice() {
   if (!canEditDashboard()) return;
 
-  const select = document.getElementById("addDeviceSelect");
+  const idInput = document.getElementById("addDeviceIdInput");
   const typeSelect = document.getElementById("addDeviceTypeSelect");
   const nameInput = document.getElementById("addDeviceNameInput");
   const checkedCards = document.querySelectorAll("#addDeviceCardChoices input[type='checkbox']:checked");
 
-  if (!select || !select.value || !typeSelect) return;
-  const id = select.value;
+  if (!typeSelect) return;
+  const id = idInput?.value.trim() || "";
+  if (!id) return alert(tDash("deviceIdRequired"));
+  if (/[.#$\[\]/]/.test(id)) return alert(tDash("invalidDeviceId"));
+  if (devices[id]) return alert(tDash("deviceAlreadyExists"));
+  const customName = nameInput?.value.trim() || "";
+  const selectedType = typeSelect.value;
 
   const selectedKeys = [...checkedCards].map(cb => cb.value);
   if (!selectedKeys.length) return alert(tDash("selectOneCard"));
 
-  const cfg = createDashboardDeviceConfig(id, devices[id], {
-    customName: nameInput?.value.trim() || undefined,
-    type: typeSelect.value,
+  const deviceForConfig = await createDeviceInDb(id, selectedType, customName, selectedKeys);
+
+  const cfg = createDashboardDeviceConfig(id, deviceForConfig, {
+    customName: customName || undefined,
+    type: selectedType,
     selectedKeys
   });
 
@@ -760,7 +1217,7 @@ function renderDeviceToggles() {
     cb.checked = cfg.visible !== false;
     cb.onchange = () => db.ref(`user/${uid}/dashboard/devices/${id}/visible`).set(cb.checked);
 
-    label.append(cb, " ", cfg.name || id);
+    label.append(cb, " ", resolveDeviceNameForLang(id, cfg.name));
     box.appendChild(label);
   });
 }
@@ -775,7 +1232,7 @@ function renderDashboard() {
   const hasCfg = Object.keys(dashboardCfg || {}).length > 0;
 
   if (!hasDevices && !hasCfg) {
-    dash.innerHTML = `<div class="empty-state"><h3>${tDash("noDevicesTitle")}</h3><p>DB path: ${deviceDataPath || "user/{uid}/devices"}</p></div>`;
+    dash.innerHTML = `<div class="empty-state"><h3>${tDash("noDevicesTitle")}</h3><p>${tDash("dbPathLabel")}: ${deviceDataPath || "user/{uid}/devices"}</p></div>`;
     return;
   }
 
@@ -794,19 +1251,23 @@ function renderDashboard() {
     header.className = "device-header";
 
     const title = document.createElement("h2");
-    title.textContent = cfg.name || id;
+    title.textContent = resolveDeviceNameForLang(id, cfg.name);
 
     const customizeBtn = document.createElement("button");
     customizeBtn.type = "button";
     customizeBtn.textContent = tDash("customizeBtn");
     customizeBtn.addEventListener("click", () => openCustomize(id));
 
+    const actions = document.createElement("div");
+    actions.className = "device-header-actions";
+    actions.appendChild(customizeBtn);
+
     const cardsWrap = document.createElement("div");
     cardsWrap.className = "cards sortable";
     cardsWrap.id = `cards-${id}`;
 
     header.appendChild(title);
-    if (unlocked) header.appendChild(customizeBtn);
+    if (unlocked) header.appendChild(actions);
     box.appendChild(header);
     box.appendChild(cardsWrap);
     dash.appendChild(box);
@@ -824,15 +1285,30 @@ function renderDashboard() {
   }
 }
 
+async function deleteDeviceEverywhere(deviceId) {
+  if (!canEditDashboard()) return;
+  const label = resolveDeviceNameForLang(
+    deviceId,
+    (dashboardCfg[deviceId] && dashboardCfg[deviceId].name) || (devices[deviceId] && devices[deviceId].name)
+  );
+  if (!confirm(`${tDash("deleteDeviceSymbolTitle")}: ${label}?`)) return;
+
+  await db.ref(`user/${uid}/dashboard/devices/${deviceId}`).remove();
+  await db.ref(`${deviceDataPath}/${deviceId}`).remove();
+
+  if (activeDevice === deviceId) closeCustomize();
+}
+
 function getEffectiveCardMeta(deviceId, key, cardCfg, deviceCfg) {
   const cfg = deviceCfg || dashboardCfg[deviceId] || {};
   const device = devices[deviceId] || {};
+  const sourceKey = cardCfg.sourceKey || key;
   const baseCatalog = getTypeCatalogForDevice(cfg.type || inferDeviceType(device), device);
-  const base = baseCatalog[key] || inferMetaFromKey(key);
+  const base = baseCatalog[sourceKey] || inferMetaFromKey(sourceKey);
   return {
     ...base,
     ...cardCfg,
-    label: resolveCardLabelForLang(key, cardCfg.label, base.label || humanize(key)),
+    label: resolveCardLabelForLang(sourceKey, cardCfg.label, base.label || humanize(sourceKey)),
     type: cardCfg.type || base.type || "display",
     unit: cardCfg.unit ?? base.unit ?? "",
     icon: cardCfg.icon ?? base.icon ?? ""
@@ -854,6 +1330,7 @@ function renderCards(deviceId, cfgOverride) {
 
   orderedCards.forEach(([key, cardCfg]) => {
     const meta = getEffectiveCardMeta(deviceId, key, cardCfg, cfg);
+    const metricKey = cardCfg.sourceKey || key;
 
     const card = document.createElement("div");
     card.className = "card";
@@ -861,7 +1338,8 @@ function renderCards(deviceId, cfgOverride) {
 
     const dragHandle = document.createElement("span");
     dragHandle.className = "drag-handle";
-    dragHandle.textContent = "?";
+    dragHandle.textContent = "";
+    dragHandle.setAttribute("aria-label", tDash("reorderCardAriaLabel"));
 
     const header = document.createElement("div");
     header.className = "card-header";
@@ -870,7 +1348,10 @@ function renderCards(deviceId, cfgOverride) {
     label.textContent = `${meta.label}`;
 
     header.appendChild(label);
-    if (unlocked) card.appendChild(dragHandle);
+    if (unlocked) {
+      card.classList.add("has-drag-handle");
+      card.appendChild(dragHandle);
+    }
 
     const valueEl = document.createElement("div");
     valueEl.className = "card-value";
@@ -879,8 +1360,8 @@ function renderCards(deviceId, cfgOverride) {
     card.appendChild(valueEl);
     wrap.appendChild(card);
 
-    getDeviceValueRef(deviceId, key).on("value", snap => {
-      renderCardValue(valueEl, meta, snap.val(), deviceId, key);
+    getDeviceValueRef(deviceId, metricKey).on("value", snap => {
+      renderCardValue(valueEl, meta, snap.val(), deviceId, metricKey, card);
     });
 
     count += 1;
@@ -891,8 +1372,9 @@ function renderCards(deviceId, cfgOverride) {
   return count;
 }
 
-function renderCardValue(el, meta, val, deviceId, key) {
+function renderCardValue(el, meta, val, deviceId, key, cardEl) {
   el.innerHTML = "";
+  applyPercentageCardShade(cardEl, meta, val);
 
   if (meta.type === "display") {
     el.textContent = format(val, meta.unit);
@@ -936,6 +1418,30 @@ function renderCardValue(el, meta, val, deviceId, key) {
   el.textContent = format(val, meta.unit);
 }
 
+function applyPercentageCardShade(cardEl, meta, val) {
+  if (!cardEl) return;
+
+  const unit = String(meta?.unit || "").trim();
+  if (unit !== "%") {
+    cardEl.classList.remove("percent-card");
+    cardEl.style.removeProperty("--percent-card-bg");
+    return;
+  }
+
+  cardEl.classList.add("percent-card");
+
+  const numeric = Number(val);
+  if (!Number.isFinite(numeric)) {
+    cardEl.style.removeProperty("--percent-card-bg");
+    return;
+  }
+
+  const clamped = Math.max(0, Math.min(100, numeric));
+  const hue = (clamped / 100) * 120;
+  const bg = `hsl(${hue}, 72%, 91%)`;
+  cardEl.style.setProperty("--percent-card-bg", bg);
+}
+
 function enableCardReorder(container, deviceId) {
   if (sortableByDevice[deviceId]) sortableByDevice[deviceId].destroy();
 
@@ -960,13 +1466,15 @@ function openCustomize(deviceId) {
   activeDevice = deviceId;
   const cfg = dashboardCfg[deviceId];
   if (!cfg) return;
+  activeDeviceOriginalCards = JSON.parse(JSON.stringify(cfg.cards || {}));
 
-  document.getElementById("customizeTitle").textContent = `Customize ${cfg.name || deviceId}`;
-  document.getElementById("deviceNameInput").value = cfg.name || deviceId;
+  const displayName = resolveDeviceNameForLang(deviceId, cfg.name);
+  document.getElementById("customizeTitle").textContent = `${tDash("customizeTitlePrefix")} ${displayName}`;
+  document.getElementById("deviceNameInput").value = displayName;
 
   const typeSelect = document.getElementById("deviceTypeInput");
   populateDeviceTypeOptions(typeSelect);
-  typeSelect.value = cfg.type || inferDeviceType(devices[deviceId]);
+  typeSelect.value = normalizeDeviceType(cfg.type || inferDeviceType(devices[deviceId]));
 
   renderCustomizeCardOptions(deviceId);
   populateAddCardSelect(deviceId);
@@ -991,7 +1499,7 @@ function renderCustomizeCardOptions(deviceId) {
 
     const title = document.createElement("span");
     title.className = "card-option-title";
-    title.textContent = key;
+    title.textContent = meta.label || humanize(key);
 
     const visibleWrap = document.createElement("label");
     const visibleCb = document.createElement("input");
@@ -1014,7 +1522,7 @@ function renderCustomizeCardOptions(deviceId) {
     CARD_TYPES.forEach(mode => {
       const opt = document.createElement("option");
       opt.value = mode;
-      opt.textContent = mode;
+      opt.textContent = getCardTypeLabel(mode);
       modeSelect.appendChild(opt);
     });
     modeSelect.value = meta.type;
@@ -1045,19 +1553,45 @@ function populateAddCardSelect(deviceId) {
 
   const cfg = dashboardCfg[deviceId];
   const typeCatalog = getTypeCatalogForDevice(cfg.type || inferDeviceType(devices[deviceId]), devices[deviceId]);
-  const missing = Object.keys(typeCatalog).filter(key => !(cfg.cards || {})[key]);
+  const options = Object.keys(typeCatalog);
 
   select.innerHTML = "";
-  missing.forEach(key => {
+  options.forEach(key => {
     const meta = typeCatalog[key] || inferMetaFromKey(key);
     const opt = document.createElement("option");
     opt.value = key;
-    opt.textContent = `${meta.label || humanize(key)}`;
+    opt.textContent = `${resolveCardLabelForLang(key, meta.label, humanize(key))} (${key})`;
     select.appendChild(opt);
   });
 
-  select.disabled = missing.length === 0;
-  addBtn.disabled = missing.length === 0;
+  if (options.length === 0) {
+    const opt = document.createElement("option");
+    opt.value = "";
+    opt.textContent = tDash("noAddCardOptions");
+    select.appendChild(opt);
+  } else {
+    select.value = options[0];
+  }
+
+  select.disabled = options.length === 0;
+  addBtn.disabled = options.length === 0;
+}
+
+function buildDuplicateCardKey(cards, baseKey) {
+  if (!cards[baseKey]) return baseKey;
+  let index = 1;
+  let candidate = `${baseKey}${index}`;
+  while (cards[candidate]) {
+    index += 1;
+    candidate = `${baseKey}${index}`;
+  }
+  return candidate;
+}
+
+function getCardLabelForKey(baseLabel, cardKey) {
+  const m = /(\d+)$/.exec(cardKey);
+  if (!m) return baseLabel;
+  return `${baseLabel} ${m[1]}`;
 }
 
 function addCardToActiveDevice() {
@@ -1066,19 +1600,27 @@ function addCardToActiveDevice() {
   if (!select || !select.value) return;
 
   const cfg = dashboardCfg[activeDevice];
+  if (!cfg) return;
+  if (!cfg.cards || typeof cfg.cards !== "object") cfg.cards = {};
+
   const typeCatalog = getTypeCatalogForDevice(cfg.type || inferDeviceType(devices[activeDevice]), devices[activeDevice]);
-  const key = select.value;
-  const meta = typeCatalog[key] || inferMetaFromKey(key);
+  const baseKey = select.value;
+  const cardKey = buildDuplicateCardKey(cfg.cards, baseKey);
+  const meta = typeCatalog[baseKey] || inferMetaFromKey(baseKey);
+  const label = getCardLabelForKey(meta.label || humanize(baseKey), cardKey);
 
   const maxOrder = Math.max(0, ...Object.values(cfg.cards || {}).map(c => c.order || 0));
-  cfg.cards[key] = {
+  cfg.cards[cardKey] = {
     visible: true,
     order: maxOrder + 1,
-    label: meta.label || humanize(key),
+    sourceKey: baseKey,
+    label,
     type: meta.type || "display",
     unit: meta.unit || "",
     icon: meta.icon || ""
   };
+
+  upsertCatalogCard(baseKey, cfg.cards[cardKey]);
 
   renderCustomizeCardOptions(activeDevice);
   populateAddCardSelect(activeDevice);
@@ -1086,34 +1628,99 @@ function addCardToActiveDevice() {
 
 function closeCustomize() {
   document.getElementById("customizeModal").classList.add("hide");
+  activeDeviceOriginalCards = null;
 }
 
 async function removeActiveDeviceFromDashboard() {
   if (!canEditDashboard()) return;
   if (!activeDevice) return;
-  if (!confirm("Remove this device from dashboard?")) return;
-
-  await db.ref(`user/${uid}/dashboard/devices/${activeDevice}`).remove();
-  closeCustomize();
+  await deleteDeviceEverywhere(activeDevice);
 }
 
-function saveCustomize() {
+function collectCatalogLabelUpdates(deviceType, cards) {
+  const typeCatalog = catalog || {};
+  const updates = {};
+
+  Object.entries(cards || {}).forEach(([cardKey, cardCfg]) => {
+    const sourceKey = cardCfg.sourceKey || cardKey;
+    const catalogMeta = typeCatalog[sourceKey];
+    if (!catalogMeta) return;
+
+    const nextLabel = String(cardCfg.label || "").trim();
+    if (!nextLabel) return;
+    if (nextLabel === String(catalogMeta.label || "").trim()) return;
+
+    updates[`user/${uid}/catalog/${sourceKey}/label`] = nextLabel;
+  });
+
+  return updates;
+}
+
+function upsertCatalogCard(sourceKey, cardCfg) {
+  const key = String(sourceKey || "").trim();
+  if (!key) return;
+
+  const existing = (catalog && catalog[key]) || {};
+  const next = {
+    ...existing,
+    label: String(cardCfg.label || existing.label || humanize(key)).trim(),
+    type: cardCfg.type || existing.type || "display",
+    unit: cardCfg.unit ?? existing.unit ?? "",
+    icon: cardCfg.icon ?? existing.icon ?? ""
+  };
+
+  if (!catalog) catalog = {};
+  catalog[key] = next;
+  db.ref(`user/${uid}/catalog/${key}`).update(next);
+}
+
+function getCardSourceCounts(cards) {
+  const counts = {};
+  Object.entries(cards || {}).forEach(([cardKey, cardCfg]) => {
+    const sourceKey = cardCfg.sourceKey || cardKey;
+    counts[sourceKey] = (counts[sourceKey] || 0) + 1;
+  });
+  return counts;
+}
+
+async function saveCustomize() {
   if (!canEditDashboard()) return;
   if (!activeDevice) return;
 
   const cfg = dashboardCfg[activeDevice];
   const name = document.getElementById("deviceNameInput").value.trim();
   const type = document.getElementById("deviceTypeInput").value;
-  if (!name) return alert("Device name required");
+  if (!name) return alert(tDash("deviceNameRequired"));
 
   cfg.name = name;
   cfg.type = type;
   normalizeCardOrder(cfg.cards || {});
 
-  db.ref(`user/${uid}/dashboard/devices/${activeDevice}`).update({
-    name: cfg.name,
-    type: cfg.type,
-    cards: cfg.cards
+  const originalCounts = getCardSourceCounts(activeDeviceOriginalCards || {});
+  const nextCounts = getCardSourceCounts(cfg.cards || {});
+  const removedSourceKeys = Object.keys(originalCounts).filter(sourceKey => !nextCounts[sourceKey]);
+
+  const updates = {
+    [`user/${uid}/dashboard/devices/${activeDevice}/name`]: cfg.name,
+    [`user/${uid}/dashboard/devices/${activeDevice}/type`]: cfg.type,
+    [`user/${uid}/dashboard/devices/${activeDevice}/cards`]: cfg.cards,
+    ...collectCatalogLabelUpdates(cfg.type, cfg.cards)
+  };
+
+  removedSourceKeys.forEach(sourceKey => {
+    updates[`${deviceDataPath}/${activeDevice}/${sourceKey}`] = null;
+  });
+
+  await db.ref().update(updates);
+
+  if (!catalog) catalog = {};
+  Object.entries(cfg.cards || {}).forEach(([cardKey, cardCfg]) => {
+    const sourceKey = cardCfg.sourceKey || cardKey;
+    if (!catalog[sourceKey]) return;
+    catalog[sourceKey] = {
+      ...catalog[sourceKey],
+      label: cardCfg.label
+    };
   });
 
   closeCustomize();
