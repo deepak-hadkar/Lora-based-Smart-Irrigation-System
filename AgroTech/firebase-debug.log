@@ -70,3 +70,63 @@ Before we get started, keep in mind:
 [info] 
 [info] ✔  Success! Logged into GitHub as deepak-hadkar 
 [info] 
+[debug] [2023-12-29T08:42:50.123Z] >>> [apiv2][query] GET https://api.github.com/repos/deepak-hadkar/Lora-based-Smart-Irrigation-System/AgroTech/actions/secrets/public-key type=owner
+[debug] [2023-12-29T08:42:50.440Z] <<< [apiv2][status] GET https://api.github.com/repos/deepak-hadkar/Lora-based-Smart-Irrigation-System/AgroTech/actions/secrets/public-key 404
+[debug] [2023-12-29T08:42:50.440Z] <<< [apiv2][body] GET https://api.github.com/repos/deepak-hadkar/Lora-based-Smart-Irrigation-System/AgroTech/actions/secrets/public-key {"message":"Not Found","documentation_url":"https://docs.github.com/rest"}
+[info] 
+[info] 
+[error] ⚠  The provided authorization cannot be used with this repository. If this repository is in an organization, did you remember to grant access? 
+[info] 
+[info] i  Action required: Visit this URL to ensure access has been granted to the appropriate organization(s) for the Firebase CLI GitHub OAuth App: 
+[info] https://github.com/settings/connections/applications/89cf50f02ac6aaed3484
+[info] 
+[debug] [2023-12-29T08:42:57.114Z] >>> [apiv2][query] GET https://api.github.com/repos/deepak-hadkar/Lora-based-Smart-Irrigation-System/AgroTech/actions/secrets/public-key type=owner
+[debug] [2023-12-29T08:42:57.400Z] <<< [apiv2][status] GET https://api.github.com/repos/deepak-hadkar/Lora-based-Smart-Irrigation-System/AgroTech/actions/secrets/public-key 404
+[debug] [2023-12-29T08:42:57.400Z] <<< [apiv2][body] GET https://api.github.com/repos/deepak-hadkar/Lora-based-Smart-Irrigation-System/AgroTech/actions/secrets/public-key {"message":"Not Found","documentation_url":"https://docs.github.com/rest"}
+[info] 
+[info] 
+[error] ⚠  The provided authorization cannot be used with this repository. If this repository is in an organization, did you remember to grant access? 
+[info] 
+[info] i  Action required: Visit this URL to ensure access has been granted to the appropriate organization(s) for the Firebase CLI GitHub OAuth App: 
+[info] https://github.com/settings/connections/applications/89cf50f02ac6aaed3484
+[info] 
+[debug] [2023-12-29T08:43:01.163Z] >>> [apiv2][query] GET https://api.github.com/repos/deepak-hadkar/Lora-based-Smart-Irrigation-System/AgroTech    /actions/secrets/public-key type=owner
+[debug] [2023-12-29T08:43:01.511Z] <<< [apiv2][status] GET https://api.github.com/repos/deepak-hadkar/Lora-based-Smart-Irrigation-System/AgroTech    /actions/secrets/public-key 404
+[debug] [2023-12-29T08:43:01.512Z] <<< [apiv2][body] GET https://api.github.com/repos/deepak-hadkar/Lora-based-Smart-Irrigation-System/AgroTech    /actions/secrets/public-key {"message":"Not Found","documentation_url":"https://docs.github.com/rest"}
+[info] 
+[info] 
+[error] ⚠  The provided authorization cannot be used with this repository. If this repository is in an organization, did you remember to grant access? 
+[info] 
+[info] i  Action required: Visit this URL to ensure access has been granted to the appropriate organization(s) for the Firebase CLI GitHub OAuth App: 
+[info] https://github.com/settings/connections/applications/89cf50f02ac6aaed3484
+[info] 
+[debug] [2023-12-29T08:43:03.478Z] >>> [apiv2][query] GET https://api.github.com/repos/deepak-hadkar/Lora-based-Smart-Irrigation-System/AgroTech    /actions/secrets/public-key type=owner
+[debug] [2023-12-29T08:43:03.867Z] <<< [apiv2][status] GET https://api.github.com/repos/deepak-hadkar/Lora-based-Smart-Irrigation-System/AgroTech    /actions/secrets/public-key 404
+[debug] [2023-12-29T08:43:03.867Z] <<< [apiv2][body] GET https://api.github.com/repos/deepak-hadkar/Lora-based-Smart-Irrigation-System/AgroTech    /actions/secrets/public-key {"message":"Not Found","documentation_url":"https://docs.github.com/rest"}
+[info] 
+[info] 
+[error] ⚠  The provided authorization cannot be used with this repository. If this repository is in an organization, did you remember to grant access? 
+[info] 
+[info] i  Action required: Visit this URL to ensure access has been granted to the appropriate organization(s) for the Firebase CLI GitHub OAuth App: 
+[info] https://github.com/settings/connections/applications/89cf50f02ac6aaed3484
+[info] 
+[debug] [2023-12-29T08:43:48.503Z] >>> [apiv2][query] GET https://api.github.com/repos/deepak-hadkar/Lora-based-Smart-Irrigation-System/AgroTech    /actions/secrets/public-key type=owner
+[debug] [2023-12-29T08:43:48.828Z] <<< [apiv2][status] GET https://api.github.com/repos/deepak-hadkar/Lora-based-Smart-Irrigation-System/AgroTech    /actions/secrets/public-key 404
+[debug] [2023-12-29T08:43:48.828Z] <<< [apiv2][body] GET https://api.github.com/repos/deepak-hadkar/Lora-based-Smart-Irrigation-System/AgroTech    /actions/secrets/public-key {"message":"Not Found","documentation_url":"https://docs.github.com/rest"}
+[info] 
+[info] 
+[error] ⚠  The provided authorization cannot be used with this repository. If this repository is in an organization, did you remember to grant access? 
+[info] 
+[info] i  Action required: Visit this URL to ensure access has been granted to the appropriate organization(s) for the Firebase CLI GitHub OAuth App: 
+[info] https://github.com/settings/connections/applications/89cf50f02ac6aaed3484
+[info] 
+[debug] [2023-12-29T08:43:51.066Z] >>> [apiv2][query] GET https://api.github.com/repos/deepak-hadkar/Lora-based-Smart-Irrigation-System/AgroTech    /actions/secrets/public-key type=owner
+[debug] [2023-12-29T08:43:51.381Z] <<< [apiv2][status] GET https://api.github.com/repos/deepak-hadkar/Lora-based-Smart-Irrigation-System/AgroTech    /actions/secrets/public-key 404
+[debug] [2023-12-29T08:43:51.382Z] <<< [apiv2][body] GET https://api.github.com/repos/deepak-hadkar/Lora-based-Smart-Irrigation-System/AgroTech    /actions/secrets/public-key {"message":"Not Found","documentation_url":"https://docs.github.com/rest"}
+[info] 
+[info] 
+[error] ⚠  The provided authorization cannot be used with this repository. If this repository is in an organization, did you remember to grant access? 
+[info] 
+[info] i  Action required: Visit this URL to ensure access has been granted to the appropriate organization(s) for the Firebase CLI GitHub OAuth App: 
+[info] https://github.com/settings/connections/applications/89cf50f02ac6aaed3484
+[info] 
