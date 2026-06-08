@@ -75,10 +75,10 @@
     </div>
 
     <label id="valveOnLabel">Valve ON</label>
-    <input type="text" id="event-start-time" inputmode="numeric" autocomplete="off" placeholder="HH:MM">
+    <input type="text" id="event-start-time" inputmode="numeric" autocomplete="off" placeholder="HH:MM" readonly>
 
     <label id="valveOffLabel">Valve OFF</label>
-    <input type="text" id="event-end-time" inputmode="numeric" autocomplete="off" placeholder="HH:MM">
+    <input type="text" id="event-end-time" inputmode="numeric" autocomplete="off" placeholder="HH:MM" readonly>
 
     <div class="actions">
       <button type="button" class="cancel" id="cancelBtn">Cancel</button>
@@ -86,6 +86,30 @@
       <button type="button" class="cancel hide" id="deleteBtn">Cancel Schedule</button>
     </div>
   </form>
+</dialog>
+
+<!-- CLOCK PICKER -->
+<dialog id="timePickerModal" class="time-picker-modal">
+  <div class="time-picker-card">
+    <h3 id="timePickerTitle">Select Time</h3>
+    <div class="time-picker-readout" id="timePickerReadout">00:00</div>
+
+    <div class="time-picker-mode-row">
+      <button type="button" id="pickHourBtn" class="active">Hour</button>
+      <button type="button" id="pickMinuteBtn">Minute</button>
+    </div>
+
+    <div id="timePickerDial" class="time-picker-dial">
+      <div id="timePickerHand" class="time-picker-hand"></div>
+      <div class="time-picker-center-dot"></div>
+      <div id="timePickerMarks" class="time-picker-marks"></div>
+    </div>
+
+    <div class="time-picker-actions">
+      <button type="button" id="timePickerCancelBtn" class="cancel">Cancel</button>
+      <button type="button" id="timePickerSetBtn" class="save">Set</button>
+    </div>
+  </div>
 </dialog>
 
 <!-- HISTORY -->
