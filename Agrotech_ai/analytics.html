@@ -14,6 +14,7 @@
 <!-- Highcharts -->
 <script src="https://code.highcharts.com/highcharts.js"></script>
 <script src="https://code.highcharts.com/modules/accessibility.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
 <!-- Firebase v8 -->
 <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
@@ -65,7 +66,7 @@ const HISTORY_PATHS = [
 ];
 
 let tempChart, humChart, moistChart;
-const LANGUAGE_STORAGE_KEY = 'smartagro_language';
+const ANALYTICS_LANGUAGE_STORAGE_KEY = 'smartagro_language';
 
 const I18N = {
   en: {
@@ -80,9 +81,9 @@ const I18N = {
     moistSeries: 'Moisture'
   },
   hi: {
-    analyticsTitle: 'फील्ड एनालिटिक्स',
+    analyticsTitle: 'क्षेत्र विश्लेषण',
     analyticsDesc: 'तापमान, आर्द्रता और मिट्टी की नमी पर रियल-टाइम जानकारी, जिससे किसान डेटा-आधारित सिंचाई निर्णय ले सकें।',
-    analyticsFooter: '© 2025 स्मार्टएग्रो एनालिटिक्स — डेटा के साथ बढ़ती खेती',
+    analyticsFooter: '© 2025 स्मार्टएग्रो विश्लेषण — डेटा के साथ बढ़ती खेती',
     tempTrend: 'तापमान ट्रेंड',
     humTrend: 'आर्द्रता ट्रेंड',
     moistTrend: 'मिट्टी नमी ट्रेंड',
@@ -91,12 +92,12 @@ const I18N = {
     moistSeries: 'नमी'
   },
   mr: {
-    analyticsTitle: 'फील्ड अॅनालिटिक्स',
+    analyticsTitle: 'शेती विश्लेषण',
     analyticsDesc: 'तापमान, आर्द्रता आणि मातीतील ओलावा याबाबत रिअल-टाइम माहिती, ज्यामुळे शेतकरी डेटा-आधारित सिंचन निर्णय घेऊ शकतात.',
-    analyticsFooter: '© 2025 स्मार्टअ‍ॅग्रो अॅनालिटिक्स — डेटासह वाढणारी शेती',
-    tempTrend: 'तापमान ट्रेंड',
-    humTrend: 'आर्द्रता ट्रेंड',
-    moistTrend: 'माती ओलावा ट्रेंड',
+    analyticsFooter: '© 2025 स्मार्टअ‍ॅग्रो विश्लेषण — डेटासह वाढणारी शेती',
+    tempTrend: 'तापमान कल',
+    humTrend: 'आर्द्रता कल',
+    moistTrend: 'माती ओलावा कल',
     tempSeries: 'तापमान',
     humSeries: 'आर्द्रता',
     moistSeries: 'ओलावा'
@@ -104,7 +105,7 @@ const I18N = {
 };
 
 function getCurrentLanguage() {
-  const lang = localStorage.getItem(LANGUAGE_STORAGE_KEY) || 'en';
+  const lang = localStorage.getItem(ANALYTICS_LANGUAGE_STORAGE_KEY) || 'en';
   return I18N[lang] ? lang : 'en';
 }
 
@@ -136,6 +137,227 @@ function applyPageLanguage(lang) {
       series: [{ name: t(lang, 'moistSeries') }]
     }, true, false, false);
   }
+
+}
+
+function normalizeHeader(text) {
+  return String(text || '').toLowerCase().replace(/[^a-z]/g, '');
+}
+
+function parseExcelDate(value) {
+  if (value instanceof Date && Number.isFinite(value.getTime())) return value.getTime();
+  if (typeof value === 'number' && Number.isFinite(value)) {
+    const parsed = XLSX.SSF.parse_date_code(value);
+    if (!parsed) return NaN;
+    return Date.UTC(parsed.y, parsed.m - 1, parsed.d, parsed.H || 0, parsed.M || 0, parsed.S || 0);
+  }
+  const dt = new Date(String(value || '').trim());
+  return Number.isFinite(dt.getTime()) ? dt.getTime() : NaN;
+}
+
+function findColumnValue(row, aliases) {
+  const entries = Object.entries(row || {});
+  for (const [key, val] of entries) {
+    const normalized = normalizeHeader(key);
+    if (aliases.includes(normalized)) return val;
+  }
+  return undefined;
+}
+
+function parseRowsFromSheet(rows) {
+  const parsed = [];
+
+  rows.forEach(row => {
+    const dateVal = findColumnValue(row, ['date', 'day', 'datetime', 'timestamp']);
+    const tempVal = findColumnValue(row, ['temperature', 'temp']);
+    const humVal = findColumnValue(row, ['humidity', 'hum']);
+    const moistVal = findColumnValue(row, ['moisture', 'soilmoisture', 'moist']);
+
+    const ts = parseExcelDate(dateVal);
+    const temperature = Number(tempVal);
+    const humidity = Number(humVal);
+    const moisture = Number(moistVal);
+
+    if (!Number.isFinite(ts)) return;
+    if (!Number.isFinite(temperature) && !Number.isFinite(humidity) && !Number.isFinite(moisture)) return;
+
+    parsed.push({
+      t: ts,
+      Temperature: Number.isFinite(temperature) ? temperature : null,
+      Humidity: Number.isFinite(humidity) ? humidity : null,
+      Moisture: Number.isFinite(moisture) ? moisture : null
+    });
+  });
+
+  return parsed.sort((a, b) => a.t - b.t);
+}
+
+function setAxisMinMax(chart, values) {
+  if (!chart) return;
+  if (!values.length) {
+    chart.yAxis[0].setExtremes(null, null, false, false);
+    return;
+  }
+  let min = Math.min(...values);
+  let max = Math.max(...values);
+  if (min === max) {
+    min -= 1;
+    max += 1;
+  }
+  const pad = (max - min) * 0.08;
+  chart.yAxis[0].setExtremes(min - pad, max + pad, false, false);
+}
+
+function applyExcelDataToCharts(readings) {
+  const tempSeries = buildSeries(readings, 'Temperature');
+  const humSeries = buildSeries(readings, 'Humidity');
+  const moistSeries = buildSeries(readings, 'Moisture');
+
+  tempChart.series[0].setData(tempSeries, false);
+  humChart.series[0].setData(humSeries, false);
+  moistChart.series[0].setData(moistSeries, false);
+
+  setAxisMinMax(tempChart, tempSeries.map(p => p[1]));
+  setAxisMinMax(humChart, humSeries.map(p => p[1]));
+  setAxisMinMax(moistChart, moistSeries.map(p => p[1]));
+
+  tempChart.redraw();
+  humChart.redraw();
+  moistChart.redraw();
+}
+
+async function handleExcelFile(file) {
+  if (!file) return;
+  try {
+    const buffer = await file.arrayBuffer();
+    const workbook = XLSX.read(buffer, { type: 'array' });
+    const sheetName = workbook.SheetNames[0];
+    const sheet = workbook.Sheets[sheetName];
+    const rows = XLSX.utils.sheet_to_json(sheet, { defval: null, raw: true });
+
+    if (!rows.length) {
+      return false;
+    }
+
+    const hasRequiredColumns = Object.keys(rows[0] || {}).some(k => ['date', 'day', 'datetime', 'timestamp'].includes(normalizeHeader(k)))
+      && Object.keys(rows[0] || {}).some(k => ['temperature', 'temp'].includes(normalizeHeader(k)))
+      && Object.keys(rows[0] || {}).some(k => ['humidity', 'hum'].includes(normalizeHeader(k)))
+      && Object.keys(rows[0] || {}).some(k => ['moisture', 'soilmoisture', 'moist'].includes(normalizeHeader(k)));
+
+    if (!hasRequiredColumns) {
+      return false;
+    }
+
+    const parsed = parseRowsFromSheet(rows);
+    if (!parsed.length) {
+      return false;
+    }
+
+    applyExcelDataToCharts(parsed);
+    return true;
+  } catch (err) {
+    console.warn('excel load failed', err && err.message);
+    return false;
+  }
+}
+
+function getFileNameFromPath(path) {
+  const sheetId = extractGoogleSheetId(path);
+  if (sheetId) return `${sheetId}.xlsx`;
+  const normalized = String(path || '').replace(/\\/g, '/');
+  const parts = normalized.split('/');
+  return parts[parts.length - 1] || 'data.xlsx';
+}
+
+function extractGoogleSheetId(path) {
+  const text = String(path || '').replace(/\\/g, '/').trim();
+  const match = text.match(/docs\.google\.com\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/i);
+  return match ? match[1] : '';
+}
+
+function getGoogleSheetGid(path) {
+  const text = String(path || '').trim();
+  const gidMatch = text.match(/[?&#]gid=(\d+)/i);
+  return gidMatch ? gidMatch[1] : '';
+}
+
+function toGoogleSheetExportUrl(path) {
+  const sheetId = extractGoogleSheetId(path);
+  if (!sheetId) return '';
+  const gid = getGoogleSheetGid(path);
+  const gidQuery = gid ? `&gid=${gid}` : '';
+  return `https://docs.google.com/spreadsheets/d/${sheetId}/export?format=xlsx${gidQuery}`;
+}
+
+function toReadableFileUrl(path) {
+  const raw = String(path || '').trim().replace(/^['"]+|['"]+$/g, '');
+  if (!raw) return '';
+  const sheetExportUrl = toGoogleSheetExportUrl(raw);
+  if (sheetExportUrl) return sheetExportUrl;
+  if (/^https?:\/\//i.test(raw) || /^file:\/\//i.test(raw)) return encodeURI(raw);
+
+  const normalized = raw.replace(/\\/g, '/');
+  if (/^[a-zA-Z]:\//.test(normalized)) {
+    return encodeURI(`file:///${normalized}`);
+  }
+
+  if (/^\\\\/.test(raw)) {
+    return encodeURI(`file:${raw}`);
+  }
+
+  // Reject short/relative fragments like "edit[1]" to avoid bad local fetch URLs.
+  const looksRelative = !normalized.includes('/') && !normalized.includes('\\');
+  if (looksRelative) return '';
+
+  return encodeURI(normalized);
+}
+
+async function loadExcelFromSavedPath(path) {
+  const url = toReadableFileUrl(path);
+  if (!url) return false;
+
+  try {
+    const response = await withTimeout(fetch(url), 12000, 'excel_path_timeout');
+    if (!response.ok) throw new Error('excel_path_http_error');
+    const blob = await response.blob();
+    const file = new File([blob], getFileNameFromPath(path), {
+      type: blob.type || 'application/octet-stream'
+    });
+    return await handleExcelFile(file);
+  } catch (err) {
+    console.warn('saved excel path load failed', err && err.message);
+    return false;
+  }
+}
+async function autoLoadExcelFromProfile(uid) {
+  try {
+    const snap = await db.ref(`user/${uid}/profile`).once('value');
+    const profile = snap.val() || {};
+    const path = String(profile.excelPath || '').trim();
+    if (!path) return false;
+    return await loadExcelFromSavedPath(path);
+  } catch (err) {
+    console.warn('excel path read failed', err && err.message);
+    return false;
+  }
+}
+
+function withTimeout(promise, ms, timeoutCode) {
+  return new Promise((resolve, reject) => {
+    const timer = setTimeout(() => {
+      reject(new Error(timeoutCode || 'timeout'));
+    }, ms);
+
+    promise
+      .then(value => {
+        clearTimeout(timer);
+        resolve(value);
+      })
+      .catch(err => {
+        clearTimeout(timer);
+        reject(err);
+      });
+  });
 }
 
 function initCharts(){
@@ -309,7 +531,10 @@ initNavbarUser(user);
   initCharts();
 
   const uid=user.uid;
-  await loadTrendForUser(uid);
+  const loadedFromExcel = await autoLoadExcelFromProfile(uid);
+  if (!loadedFromExcel) {
+    await loadTrendForUser(uid);
+  }
 });
 
 document.addEventListener('language-changed', (event) => {
