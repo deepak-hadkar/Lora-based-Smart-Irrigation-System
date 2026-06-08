@@ -1,0 +1,47 @@
+<nav class="main-navbar">
+  <div class="nav-center">
+    <a href="dashboard.html" id="navDashboardLabel">Dashboard</a>
+    <a href="analytics.html" id="navAnalyticsLabel">Analytics</a>
+    <a href="calendar.html" id="navCalendarLabel">Calendar</a>
+  </div>
+
+  <div class="nav-right">
+    <div class="profile-wrapper">
+      <div class="profile" id="profileTrigger" onclick="toggleProfileMenu()">
+        <div class="avatar" id="profileAvatar">&nbsp;</div>
+        <span id="profileName">&nbsp;</span>
+      </div>
+
+      <div class="profile-menu" id="profileMenu">
+        <div id="editProfileMenuItem" onclick="handleEditProfile()">Edit Profile</div>
+        <div class="lang-menu-item">
+          <label for="languageSelect" id="languageLabel">Language</label>
+          <select id="languageSelect">
+            <option value="en">English</option>
+            <option value="hi">हिंदी</option>
+            <option value="mr">मराठी</option>
+          </select>
+        </div>
+        <div id="adminAccessMenuItem" onclick="toggleAdminAccess()">Admin Login</div>
+        <a href="sign_out.html" id="logoutMenuItem">Logout</a>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<div id="profileEditModal" class="profile-edit-modal hide" role="dialog" aria-modal="true" aria-labelledby="profileEditTitle">
+  <div class="profile-edit-card">
+    <h3 id="profileEditTitle">Edit Profile</h3>
+    <p class="profile-edit-subtitle" id="profileEditSubtitle">Update your display name for SmartAgro.</p>
+
+    <label for="editProfileName" id="displayNameLabel">Display Name</label>
+    <input id="editProfileName" type="text" maxlength="40" placeholder="Enter your name">
+
+    <p id="profileEditError" class="profile-edit-error hide"></p>
+
+    <div class="profile-edit-actions">
+      <button type="button" id="profileEditCancel">Cancel</button>
+      <button type="button" id="profileEditSave" class="primary">Save</button>
+    </div>
+  </div>
+</div>

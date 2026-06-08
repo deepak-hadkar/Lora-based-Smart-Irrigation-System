@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Register | Digital Farming</title>
+
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            margin: 0;
+            height: 100vh;
+            background: linear-gradient(120deg, #1b5e20, #26a69a);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .card {
+            background: #ffffff;
+            width: 440px;
+            padding: 40px;
+            border-radius: 22px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
+            animation: slideUp 0.7s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .icon {
+            text-align: center;
+            font-size: 46px;
+            margin-bottom: 10px;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 5px;
+            color: #1b5e20;
+            font-weight: 600;
+        }
+
+        .subtitle {
+            text-align: center;
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 30px;
+        }
+
+        label {
+            font-size: 13px;
+            font-weight: 500;
+            color: #444;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            margin: 8px 0 18px 0;
+            border-radius: 10px;
+            border: 1px solid #ccc;
+            outline: none;
+            transition: 0.3s;
+        }
+
+        input:focus {
+            border-color: #26a69a;
+            box-shadow: 0 0 0 2px rgba(38, 166, 154, 0.2);
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 12px;
+            background: linear-gradient(120deg, #1b5e20, #26a69a);
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .footer {
+            text-align: center;
+            font-size: 13px;
+            margin-top: 20px;
+            color: #666;
+        }
+
+        .footer a {
+            color: #1b5e20;
+            font-weight: 500;
+            text-decoration: none;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
+    <link rel="stylesheet" href="css/modern-theme.css">
+
+    <!-- Firebase v8 -->
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-auth.js"></script>
+    <script src="js/number-localization.js"></script>
+
+    <script>
+        window.onload = function () {
+
+            // Keep auth navigation simple: back from this page returns to home.
+            history.pushState({ authPage: true }, "", location.href);
+            window.addEventListener("popstate", function () {
+                window.location.replace("index.html");
+            });
+
+            const firebaseConfig = {
+                apiKey: "AIzaSyAbdlXLeHw5cUyB9OnlhNuXZPQRbg8NID8",
+                authDomain: "efarm-dashboard.firebaseapp.com",
+                databaseURL: "https://efarm-dashboard-default-rtdb.firebaseio.com",
+                projectId: "efarm-dashboard",
+                storageBucket: "efarm-dashboard.appspot.com",
+                messagingSenderId: "395430854188",
+                appId: "1:395430854188:web:63f1da7c4cc93357addb89",
+                measurementId: "G-8HQ25GL1NN"
+            };
+
+            if (!firebase.apps.length) {
+                firebase.initializeApp(firebaseConfig);
+            }
+
+            const auth = firebase.auth();
+            const LANGUAGE_STORAGE_KEY = "smartagro_language";
+            let activeLang = "en";
+
+            const REG_I18N = {
+                en: {
+                    pageTitle: "Register | Digital Farming",
+                    title: "Create Account",
+                    subtitle: "Join the digital agriculture platform transforming farming",
+                    emailLabel: "Email",
+                    passwordLabel: "Password",
+                    confirmPasswordLabel: "Confirm Password",
+                    submitBtn: "Register Securely",
+                    footerText: "Already have an account?",
+                    footerLink: "Login",
+                    passwordMismatch: "Passwords do not match"
+                },
+                hi: {
+                    pageTitle: "रजिस्टर | डिजिटल फार्मिंग",
+                    title: "खाता बनाएं",
+                    subtitle: "डिजिटल कृषि प्लेटफ़ॉर्म से जुड़ें",
+                    emailLabel: "ईमेल",
+                    passwordLabel: "पासवर्ड",
+                    confirmPasswordLabel: "पासवर्ड की पुष्टि करें",
+                    submitBtn: "सुरक्षित पंजीकरण",
+                    footerText: "क्या पहले से खाता है?",
+                    footerLink: "लॉगिन",
+                    passwordMismatch: "पासवर्ड मेल नहीं खाते"
+                },
+                mr: {
+                    pageTitle: "नोंदणी | डिजिटल फार्मिंग",
+                    title: "खाते तयार करा",
+                    subtitle: "डिजिटल कृषी प्लॅटफॉर्ममध्ये सामील व्हा",
+                    emailLabel: "ईमेल",
+                    passwordLabel: "पासवर्ड",
+                    confirmPasswordLabel: "पासवर्ड पुष्टी करा",
+                    submitBtn: "सुरक्षित नोंदणी",
+                    footerText: "आधीपासून खाते आहे का?",
+                    footerLink: "लॉगिन",
+                    passwordMismatch: "पासवर्ड जुळत नाहीत"
+                }
+            };
+
+            function getCurrentLanguage() {
+                const lang = localStorage.getItem(LANGUAGE_STORAGE_KEY) || "en";
+                return REG_I18N[lang] ? lang : "en";
+            }
+
+            function tReg(key) {
+                return (REG_I18N[activeLang] && REG_I18N[activeLang][key]) || REG_I18N.en[key] || key;
+            }
+
+            function applyLanguage(lang) {
+                activeLang = REG_I18N[lang] ? lang : "en";
+                document.documentElement.lang = activeLang;
+                document.title = tReg("pageTitle");
+
+                document.querySelectorAll("[data-i18n]").forEach(function (el) {
+                    const key = el.getAttribute("data-i18n");
+                    if (!key) return;
+                    el.textContent = tReg(key);
+                });
+            }
+
+            document.getElementById("registerForm").addEventListener("submit", function (event) {
+                event.preventDefault();
+
+                const email = document.getElementById("email").value;
+                const password = document.getElementById("password").value;
+                const confirmPassword = document.getElementById("confirm-password").value;
+
+                if (password !== confirmPassword) {
+                    alert(tReg("passwordMismatch"));
+                    return;
+                }
+
+                auth.createUserWithEmailAndPassword(email, password)
+                    .then(() => {
+                        window.location.href = "dashboard.html";
+                    })
+                    .catch((error) => {
+                        alert(error.message);
+                    });
+            });
+
+            firebase.auth().onAuthStateChanged(function (user) {
+                if (user) {
+                    window.location.href = "dashboard.html";
+                }
+            });
+
+            applyLanguage(getCurrentLanguage());
+            document.addEventListener("language-changed", function (event) {
+                const lang = event && event.detail && event.detail.lang ? event.detail.lang : getCurrentLanguage();
+                applyLanguage(lang);
+            });
+        };
+    </script>
+</head>
+
+<body class="auth-page">
+
+    <div class="card">
+        <h1 data-i18n="title">Create Account</h1>
+
+        <form id="registerForm">
+            <label data-i18n="emailLabel">Email</label>
+            <input type="email" id="email" required>
+
+            <label data-i18n="passwordLabel">Password</label>
+            <input type="password" id="password" required>
+
+            <label data-i18n="confirmPasswordLabel">Confirm Password</label>
+            <input type="password" id="confirm-password" required>
+
+            <button type="submit" data-i18n="submitBtn">Register Securely</button>
+        </form>
+
+        <div class="footer">
+            <span data-i18n="footerText">Already have an account?</span>
+            <a href="sign_in.html" data-i18n="footerLink">Login</a>
+        </div>
+    </div>
+
+</body>
+</html>

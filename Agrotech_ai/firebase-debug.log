@@ -1,0 +1,44 @@
+[debug] [2023-12-29T09:08:06.741Z] ----------------------------------------------------------------------
+[debug] [2023-12-29T09:08:06.742Z] Command:       /usr/local/bin/node /usr/local/bin/firebase init hosting
+[debug] [2023-12-29T09:08:06.742Z] CLI Version:   11.28.0
+[debug] [2023-12-29T09:08:06.742Z] Platform:      darwin
+[debug] [2023-12-29T09:08:06.742Z] Node Version:  v18.16.0
+[debug] [2023-12-29T09:08:06.743Z] Time:          Fri Dec 29 2023 14:38:06 GMT+0530 (India Standard Time)
+[debug] [2023-12-29T09:08:06.743Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2023-12-29T09:08:06.775Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2023-12-29T09:08:06.776Z] > authorizing via signed-in user (kjsce.efarm@gmail.com)
+[info] 
+     ######## #### ########  ######## ########     ###     ######  ########
+     ##        ##  ##     ## ##       ##     ##  ##   ##  ##       ##
+     ######    ##  ########  ######   ########  #########  ######  ######
+     ##        ##  ##    ##  ##       ##     ## ##     ##       ## ##
+     ##       #### ##     ## ######## ########  ##     ##  ######  ########
+
+You're about to initialize a Firebase project in this directory:
+
+  /Users/deepakhadkar
+
+Before we get started, keep in mind:
+
+  * You are initializing within an existing Firebase project directory
+
+[info] 
+=== Project Setup
+[info] 
+[info] First, let's associate this project directory with a Firebase project.
+[info] You can create multiple project aliases by running firebase use --add, 
+[info] but for now we'll just set up a default project.
+[info] 
+[debug] [2023-12-29T09:08:06.777Z] Using project from CLI flag: efarm-dashboard
+[debug] [2023-12-29T09:08:06.778Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/efarm-dashboard [none]
+[debug] [2023-12-29T09:08:07.466Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/efarm-dashboard 200
+[debug] [2023-12-29T09:08:07.467Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/efarm-dashboard {"projectId":"efarm-dashboard","projectNumber":"395430854188","displayName":"Efarm Dashboard","name":"projects/efarm-dashboard","resources":{"hostingSite":"efarm-dashboard","realtimeDatabaseInstance":"efarm-dashboard-default-rtdb","storageBucket":"efarm-dashboard.appspot.com","locationId":"us-central"},"state":"ACTIVE","etag":"1_c51953fd-6d23-40ef-b84f-9eb83c75d5bc"}
+[info] i  Using project efarm-dashboard (Efarm Dashboard) 
+[info] 
+=== Hosting Setup
+[info] 
+[info] Your public directory is the folder (relative to your project directory) that
+[info] will contain Hosting assets to be uploaded with firebase deploy. If you
+[info] have a build process for your assets, use your build's output directory.
+[info] 

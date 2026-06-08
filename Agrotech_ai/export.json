@@ -1,0 +1,242 @@
+{
+  "user": {
+    "5HIdbcbsoce04nfg9sPENa8qinI2": {
+      "catalog": {
+        "actuator": {
+          "Battery": {
+            "icon": "🔋",
+            "label": "Battery",
+            "type": "display",
+            "unit": "%"
+          },
+          "Control": {
+            "icon": "⏯",
+            "label": "Valve Control",
+            "type": "toggle"
+          },
+          "OffTime": {
+            "icon": "🔴",
+            "label": "OFF Time",
+            "type": "display"
+          },
+          "OnTime": {
+            "icon": "🟢",
+            "label": "ON Time",
+            "type": "display"
+          },
+          "Status": {
+            "icon": "🚰",
+            "label": "Valve Status",
+            "type": "display"
+          }
+        },
+        "sensor": {
+          "Battery": {
+            "icon": "🔋",
+            "label": "Battery",
+            "type": "display",
+            "unit": "%"
+          },
+          "Humidity": {
+            "icon": "💧",
+            "label": "Humidity",
+            "type": "display",
+            "unit": "%"
+          },
+          "Moisture": {
+            "icon": "🌱",
+            "label": "Soil Moisture",
+            "type": "display",
+            "unit": "%"
+          },
+          "Temperature": {
+            "icon": "🌡",
+            "label": "Temperature",
+            "type": "display",
+            "unit": "°C"
+          },
+          "highThreshold": {
+            "icon": "⬆️",
+            "label": "High Threshold",
+            "type": "number-input",
+            "unit": "%"
+          },
+          "lowThreshold": {
+            "icon": "⬇️",
+            "label": "Low Threshold",
+            "type": "number-input",
+            "unit": "%"
+          }
+        }
+      },
+      "dashboard": {
+        "devices": {
+          "actuator1": {
+            "cards": {
+              "pressure": {
+                "icon": "",
+                "label": "Pressure",
+                "order": 1,
+                "type": "display",
+                "unit": "kPa",
+                "visible": true
+              },
+              "threshold": {
+                "icon": "",
+                "label": "Threshold",
+                "order": 2,
+                "type": "number-input",
+                "unit": "",
+                "visible": true
+              }
+            },
+            "name": "Device actuator1",
+            "type": "valve",
+            "visible": true
+          },
+          "sensor1": {
+            "cards": {
+              "Humidity": {
+                "icon": "",
+                "label": "Humidity",
+                "order": 2,
+                "type": "display",
+                "unit": "%",
+                "visible": true
+              },
+              "Moisture": {
+                "icon": "",
+                "label": "Soil Moisture",
+                "order": 3,
+                "type": "display",
+                "unit": "%",
+                "visible": true
+              },
+              "MoistureThreshold": {
+                "icon": "",
+                "label": "Moisture Threshold",
+                "order": 4,
+                "type": "number-input",
+                "unit": "%",
+                "visible": true
+              },
+              "Temperature": {
+                "icon": "",
+                "label": "Temperature",
+                "order": 1,
+                "type": "display",
+                "unit": "degC",
+                "visible": true
+              }
+            },
+            "name": "Device sensor1",
+            "type": "soil_sensor",
+            "visible": true
+          },
+          "sensor2": {
+            "cards": {
+              "Humidity": {
+                "icon": "",
+                "label": "Humidity",
+                "order": 2,
+                "type": "display",
+                "unit": "%",
+                "visible": true
+              },
+              "Moisture": {
+                "icon": "",
+                "label": "Soil Moisture",
+                "order": 3,
+                "type": "display",
+                "unit": "%",
+                "visible": true
+              },
+              "MoistureThreshold": {
+                "icon": "",
+                "label": "Moisture Threshold",
+                "order": 4,
+                "type": "number-input",
+                "unit": "%",
+                "visible": true
+              },
+              "Temperature": {
+                "icon": "",
+                "label": "Temperature",
+                "order": 1,
+                "type": "display",
+                "unit": "degC",
+                "visible": true
+              }
+            },
+            "name": "Device sensor2",
+            "type": "soil_sensor",
+            "visible": true
+          }
+        }
+      },
+      "devices": {
+        "actuator1": {
+          "Battery": 10,
+          "Control": 54,
+          "OffTime": "11:01:27",
+          "OnTime": "10:44:44",
+          "Status": 1,
+          "status": 0,
+          "type": "actuator"
+        },
+        "sensor1": {
+          "Battery": 97,
+          "Humidity": 0,
+          "Index": 128,
+          "Moisture": 1,
+          "Temperature": 35,
+          "Timestamp": 1734511200000,
+          "highThreshold": 69,
+          "lowThreshold": 31,
+          "type": "sensor"
+        },
+        "sensor2": {
+          "Battery": 95,
+          "Humidity": 20,
+          "Index": 129,
+          "Moisture": 30,
+          "Temperature": 25,
+          "Timestamp": 1734511200000,
+          "highThreshold": 69,
+          "lowThreshold": 31,
+          "type": "sensor"
+        }
+      },
+      "executionHistory": {
+        "2025-12-18": {
+          "completedAt": 1766061345283,
+          "off": "21:04",
+          "on": "20:04",
+          "source": "single",
+          "status": "completed"
+        },
+        "2025-12-23": {
+          "actuators": [
+            3
+          ],
+          "completedAt": 1766487601912,
+          "off": "06:30",
+          "on": "05:30",
+          "source": "weekly",
+          "status": "completed"
+        },
+        "2026-06-07": {
+          "completedAt": 1780862170294,
+          "off": "06:25",
+          "on": "05:25",
+          "source": "monthly",
+          "status": "completed"
+        }
+      },
+      "profile": {
+        "name": "Sample",
+        "updatedAt": 1780865654841
+      }
+    }
+  }
+}

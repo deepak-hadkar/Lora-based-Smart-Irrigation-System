@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Analytics | SmartAgro</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+<!-- GLOBAL CSS -->
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/modern-theme.css">
+
+<!-- Highcharts -->
+<script src="https://code.highcharts.com/highcharts.js"></script>
+<script src="https://code.highcharts.com/modules/accessibility.js"></script>
+
+<!-- Firebase v8 -->
+<script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-database.js"></script>
+</head>
+
+<body class="analytics-page">
+
+<!-- NAVBAR -->
+<div id="navbar"></div>
+
+<div class="container">
+  <div class="header">
+    <h1 data-i18n="analyticsTitle">Field Analytics</h1>
+    <p data-i18n="analyticsDesc">
+      Real-time insights into temperature, humidity, and soil moisture
+      helping farmers take data-driven irrigation decisions.
+    </p>
+  </div>
+
+  <div class="grid">
+    <div class="chart-card"><div id="tempChart"></div></div>
+    <div class="chart-card"><div id="humChart"></div></div>
+    <div class="chart-card"><div id="moistChart"></div></div>
+  </div>
+</div>
+
+<footer>
+  <span data-i18n="analyticsFooter">© 2025 SmartAgro Analytics — Growing with Data</span>
+</footer>
+
+<!-- NAVBAR LOAD + ACTIVE -->
+<script src="js/firebase-init.js"></script>
+<script src="js/navbar.js"></script>
+<script src="js/number-localization.js"></script>
+
+<!-- ANALYTICS LOGIC -->
+<script>
+const auth = window.auth;
+const db = window.db;
+const DAILY_LIMIT = 10;
+
+const HISTORY_PATHS = [
+  uid => `user/${uid}/sensorHistory`,
+  uid => `user/${uid}/sensorReadings`,
+  uid => `user/${uid}/history/sensor`,
+  uid => `user/${uid}/sensor`
+];
+
+let tempChart, humChart, moistChart;
+const LANGUAGE_STORAGE_KEY = 'smartagro_language';
+
+const I18N = {
+  en: {
+    analyticsTitle: 'Field Analytics',
+    analyticsDesc: 'Real-time insights into temperature, humidity, and soil moisture helping farmers take data-driven irrigation decisions.',
+    analyticsFooter: '© 2025 SmartAgro Analytics — Growing with Data',
+    tempTrend: 'Temperature Trend',
+    humTrend: 'Humidity Trend',
+    moistTrend: 'Soil Moisture Trend',
+    tempSeries: 'Temperature',
+    humSeries: 'Humidity',
+    moistSeries: 'Moisture'
+  },
+  hi: {
+    analyticsTitle: 'फील्ड एनालिटिक्स',
+    analyticsDesc: 'तापमान, आर्द्रता और मिट्टी की नमी पर रियल-टाइम जानकारी, जिससे किसान डेटा-आधारित सिंचाई निर्णय ले सकें।',
+    analyticsFooter: '© 2025 स्मार्टएग्रो एनालिटिक्स — डेटा के साथ बढ़ती खेती',
+    tempTrend: 'तापमान ट्रेंड',
+    humTrend: 'आर्द्रता ट्रेंड',
+    moistTrend: 'मिट्टी नमी ट्रेंड',
+    tempSeries: 'तापमान',
+    humSeries: 'आर्द्रता',
+    moistSeries: 'नमी'
+  },
+  mr: {
+    analyticsTitle: 'फील्ड अॅनालिटिक्स',
+    analyticsDesc: 'तापमान, आर्द्रता आणि मातीतील ओलावा याबाबत रिअल-टाइम माहिती, ज्यामुळे शेतकरी डेटा-आधारित सिंचन निर्णय घेऊ शकतात.',
+    analyticsFooter: '© 2025 स्मार्टअ‍ॅग्रो अॅनालिटिक्स — डेटासह वाढणारी शेती',
+    tempTrend: 'तापमान ट्रेंड',
+    humTrend: 'आर्द्रता ट्रेंड',
+    moistTrend: 'माती ओलावा ट्रेंड',
+    tempSeries: 'तापमान',
+    humSeries: 'आर्द्रता',
+    moistSeries: 'ओलावा'
+  }
+};
+
+function getCurrentLanguage() {
+  const lang = localStorage.getItem(LANGUAGE_STORAGE_KEY) || 'en';
+  return I18N[lang] ? lang : 'en';
+}
+
+function t(lang, key) {
+  return (I18N[lang] && I18N[lang][key]) || I18N.en[key] || key;
+}
+
+function applyPageLanguage(lang) {
+  document.documentElement.lang = lang;
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n');
+    if (!key) return;
+    el.textContent = t(lang, key);
+  });
+
+  if (tempChart && humChart && moistChart) {
+    tempChart.update({
+      title: { text: t(lang, 'tempTrend') },
+      series: [{ name: t(lang, 'tempSeries') }]
+    }, true, false, false);
+
+    humChart.update({
+      title: { text: t(lang, 'humTrend') },
+      series: [{ name: t(lang, 'humSeries') }]
+    }, true, false, false);
+
+    moistChart.update({
+      title: { text: t(lang, 'moistTrend') },
+      series: [{ name: t(lang, 'moistSeries') }]
+    }, true, false, false);
+  }
+}
+
+function initCharts(){
+  const lang = getCurrentLanguage();
+  tempChart = Highcharts.chart('tempChart',{
+    title:{ text:t(lang, 'tempTrend') },
+    xAxis:{ type:'datetime' },
+    yAxis:{ title:{ text:'°C' }},
+    series:[{ name:t(lang, 'tempSeries'), data:[] }]
+  });
+
+  humChart = Highcharts.chart('humChart',{
+    title:{ text:t(lang, 'humTrend') },
+    xAxis:{ type:'datetime' },
+    yAxis:{ title:{ text:'%' }},
+    series:[{ name:t(lang, 'humSeries'), data:[] }]
+  });
+
+  moistChart = Highcharts.chart('moistChart',{
+    title:{ text:t(lang, 'moistTrend') },
+    xAxis:{ type:'datetime' },
+    yAxis:{ title:{ text:'%' }},
+    series:[{ name:t(lang, 'moistSeries'), data:[] }]
+  });
+}
+
+function normalizeTimestamp(ts, fallback){
+  let n = Number(ts ?? fallback ?? Date.now());
+  if (!Number.isFinite(n) || n <= 0) n = Date.now();
+  if (n < 1e11) n *= 1000;
+  return n;
+}
+
+function toReading(node, fallbackTs){
+  if (!node || typeof node !== 'object' || Array.isArray(node)) return null;
+
+  const temp = Number(node.Temperature ?? node.temperature ?? node.temp);
+  const hum = Number(node.Humidity ?? node.humidity);
+  const moist = Number(node.Moisture ?? node.moisture ?? node.soilMoisture);
+
+  const hasValue = Number.isFinite(temp) || Number.isFinite(hum) || Number.isFinite(moist);
+  if (!hasValue) return null;
+
+  return {
+    t: normalizeTimestamp(node.Timestamp ?? node.timestamp ?? node.ts, fallbackTs),
+    Temperature: Number.isFinite(temp) ? temp : null,
+    Humidity: Number.isFinite(hum) ? hum : null,
+    Moisture: Number.isFinite(moist) ? moist : null
+  };
+}
+
+function extractReadings(raw){
+  const out = [];
+
+  function walk(node, fallbackTs, depth){
+    if (!node || typeof node !== 'object' || depth > 4) return;
+
+    if (Array.isArray(node)) {
+      node.forEach(item => walk(item, fallbackTs, depth + 1));
+      return;
+    }
+
+    const ownReading = toReading(node, fallbackTs);
+    if (ownReading) out.push(ownReading);
+
+    Object.entries(node).forEach(([key, value]) => {
+      if (!value || typeof value !== 'object') return;
+      const keyTs = Number(key);
+      const nextFallback = Number.isFinite(keyTs) ? normalizeTimestamp(keyTs) : (ownReading ? ownReading.t : fallbackTs);
+      walk(value, nextFallback, depth + 1);
+    });
+  }
+
+  walk(raw, Date.now(), 0);
+  return out.sort((a, b) => a.t - b.t);
+}
+
+function localDayKey(ts){
+  const d = new Date(ts);
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
+}
+
+function sampleMaxPerDay(readings, limit){
+  const byDay = new Map();
+
+  readings.forEach(reading => {
+    const key = localDayKey(reading.t);
+    if (!byDay.has(key)) byDay.set(key, []);
+    byDay.get(key).push(reading);
+  });
+
+  const sampled = [];
+
+  [...byDay.keys()].sort().forEach(day => {
+    const dayReadings = byDay.get(day).sort((a, b) => a.t - b.t);
+    if (dayReadings.length <= limit) {
+      sampled.push(...dayReadings);
+      return;
+    }
+
+    const picks = [];
+    const step = (dayReadings.length - 1) / (limit - 1);
+    for (let i = 0; i < limit; i += 1) {
+      const idx = Math.round(i * step);
+      picks.push(dayReadings[idx]);
+    }
+    sampled.push(...picks);
+  });
+
+  return sampled.sort((a, b) => a.t - b.t);
+}
+
+function buildSeries(readings, key){
+  return readings
+    .filter(r => Number.isFinite(r[key]))
+    .map(r => [r.t, r[key]]);
+}
+
+function renderTrend(readings){
+  const sampled = sampleMaxPerDay(readings, DAILY_LIMIT);
+
+  tempChart.series[0].setData(buildSeries(sampled, 'Temperature'), true);
+  humChart.series[0].setData(buildSeries(sampled, 'Humidity'), true);
+  moistChart.series[0].setData(buildSeries(sampled, 'Moisture'), true);
+}
+
+async function resolveBestHistoryPath(uid){
+  let best = { path: null, count: 0 };
+
+  for (const makePath of HISTORY_PATHS) {
+    const path = makePath(uid);
+    try {
+      const snap = await db.ref(path).once('value');
+      const readings = extractReadings(snap.val());
+      if (readings.length > best.count) {
+        best = { path, count: readings.length };
+      }
+    } catch (err) {
+      console.warn('history probe failed', path, err && err.message);
+    }
+  }
+
+  return best.path;
+}
+
+async function loadTrendForUser(uid){
+  const historyPath = await resolveBestHistoryPath(uid);
+  if (!historyPath) {
+    renderTrend([]);
+    return;
+  }
+
+  db.ref(historyPath).on('value', snap => {
+    const readings = extractReadings(snap.val());
+    renderTrend(readings);
+  }, err => {
+    console.warn('history subscription failed', historyPath, err && err.message);
+  });
+}
+
+auth.onAuthStateChanged(async user=>{
+  if(!user){
+    location.href="sign_in.html";
+    return;
+  }
+initNavbarUser(user);
+  applyPageLanguage(getCurrentLanguage());
+  initCharts();
+
+  const uid=user.uid;
+  await loadTrendForUser(uid);
+});
+
+document.addEventListener('language-changed', (event) => {
+  const lang = event?.detail?.lang || getCurrentLanguage();
+  applyPageLanguage(lang);
+});
+</script>
+
+</body>
+</html>

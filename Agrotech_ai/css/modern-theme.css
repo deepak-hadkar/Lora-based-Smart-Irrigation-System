@@ -1,0 +1,198 @@
+@import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap");
+
+:root {
+  --bg: #eef6f4;
+  --bg-soft: #f7fbfa;
+  --surface: #ffffff;
+  --surface-2: #e6f2ee;
+  --text: #172b25;
+  --muted: #4e6760;
+  --primary: #0b8f66;
+  --primary-strong: #096b4d;
+  --accent: #0ea5a4;
+  --border: #cde2db;
+  --danger: #a63a2f;
+  --shadow: 0 12px 30px rgba(11, 48, 38, 0.12);
+  --radius: 14px;
+  --radius-sm: 10px;
+}
+
+body.dashboard-page,
+body.calendar-page,
+body.analytics-page,
+body.auth-page {
+  font-family: "Plus Jakarta Sans", "Segoe UI", sans-serif;
+  color: var(--text);
+  background:
+    radial-gradient(circle at 20% -10%, rgba(14, 165, 164, 0.23), transparent 40%),
+    radial-gradient(circle at 90% 0%, rgba(11, 143, 102, 0.2), transparent 38%),
+    var(--bg);
+}
+
+body.dashboard-page h1,
+body.dashboard-page h2,
+body.dashboard-page h3,
+body.calendar-page h1,
+body.calendar-page h2,
+body.calendar-page h3,
+body.analytics-page h1,
+body.analytics-page h2,
+body.analytics-page h3,
+body.auth-page h1,
+body.auth-page h2,
+body.auth-page h3 {
+  font-family: "Space Grotesk", "Plus Jakarta Sans", sans-serif;
+  color: var(--text);
+}
+
+body.dashboard-page .page,
+body.analytics-page .container,
+body.calendar-page .calendar-controls,
+body.calendar-page .calendar-wrapper,
+body.calendar-page .history-header,
+body.calendar-page .history-table-wrapper {
+  width: min(100% - 2rem, 1140px);
+  margin-left: auto;
+  margin-right: auto;
+}
+
+body.dashboard-page .page {
+  padding-top: 0;
+}
+
+body.dashboard-page .device-box,
+body.dashboard-page .empty-state,
+body.dashboard-page .empty-note,
+body.dashboard-page .device-toggle-box label,
+body.dashboard-page .card,
+body.dashboard-page .modal-box,
+body.calendar-page .calendar-controls,
+body.calendar-page .calBody .calCell,
+body.calendar-page #calForm form,
+body.calendar-page .history-table-wrapper,
+body.analytics-page .header,
+body.analytics-page .chart-card,
+body.auth-page .card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+body.dashboard-page .refresh-btn,
+body.dashboard-page .add-card-row button,
+body.dashboard-page .modal-actions .primary,
+body.calendar-page .cal-actions .primary,
+body.calendar-page #calForm .save,
+body.calendar-page .history-header button,
+body.auth-page button {
+  border: 1px solid transparent;
+  background: linear-gradient(140deg, var(--primary), var(--accent));
+  color: #ffffff;
+  font-weight: 700;
+}
+
+body.dashboard-page .refresh-btn.secondary,
+body.dashboard-page .toggle.on {
+  background: linear-gradient(140deg, #0a6f50, #0b8f66);
+}
+
+body.dashboard-page .toggle.off,
+body.dashboard-page .card-option .remove-card,
+body.calendar-page .cal-actions .danger,
+body.auth-page #cancelBtn,
+body.auth-page #deleteBtn {
+  background: linear-gradient(140deg, #b1463e, #a63a2f);
+  color: #fff;
+}
+
+body.dashboard-page .modal-box input,
+body.dashboard-page .modal-box select,
+body.dashboard-page .card input,
+body.calendar-page .cal-nav select,
+body.calendar-page .cal-nav input,
+body.calendar-page #calForm input,
+body.calendar-page #calForm select,
+body.auth-page input {
+  border: 1px solid var(--border);
+  background: var(--bg-soft);
+  border-radius: var(--radius-sm);
+}
+
+body.dashboard-page .modal-box input:focus,
+body.dashboard-page .modal-box select:focus,
+body.dashboard-page .card input:focus,
+body.calendar-page .cal-nav select:focus,
+body.calendar-page .cal-nav input:focus,
+body.calendar-page #calForm input:focus,
+body.calendar-page #calForm select:focus,
+body.auth-page input:focus {
+  outline: 3px solid rgba(11, 143, 102, 0.25);
+  border-color: var(--primary);
+}
+
+body.calendar-page .cal-title,
+body.calendar-page #historyTitle,
+body.analytics-page .header h1,
+body.auth-page .card h1 {
+  color: var(--primary-strong);
+}
+
+body.analytics-page .container .header {
+  padding: 1.2rem;
+  margin-bottom: 1rem;
+}
+
+body.analytics-page .grid {
+  gap: 1rem;
+}
+
+body.analytics-page footer,
+body.calendar-page footer,
+body.auth-page .footer,
+body.auth-page .tagline {
+  color: var(--muted);
+}
+
+body.auth-page {
+  padding-top: 0;
+  min-height: 100dvh;
+  height: auto;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 1rem;
+}
+
+body.auth-page .card {
+  width: min(440px, 100%);
+  max-height: calc(100dvh - 2rem);
+  overflow-y: auto;
+  margin-top: 0;
+}
+
+body.auth-page .icon {
+  width: 58px;
+  height: 58px;
+  border-radius: 12px;
+  margin: 0 auto 12px;
+  display: grid;
+  place-items: center;
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  color: #ffffff;
+  background: linear-gradient(140deg, var(--primary), var(--accent));
+}
+
+body.auth-page .mode-btn {
+  border: 1px solid var(--border);
+  background: var(--bg-soft);
+  color: var(--primary-strong);
+}
+
+body.auth-page .mode-btn.active {
+  background: linear-gradient(140deg, var(--primary), var(--accent));
+  color: #ffffff;
+  border-color: transparent;
+}

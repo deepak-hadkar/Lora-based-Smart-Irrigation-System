@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login | Digital Farming</title>
+
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            margin: 0;
+            height: 100vh;
+            background: linear-gradient(120deg, #1b5e20, #26a69a);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .card {
+            background: #ffffff;
+            width: 420px;
+            padding: 40px;
+            border-radius: 22px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
+            animation: fadeIn 0.7s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(25px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .icon {
+            text-align: center;
+            font-size: 46px;
+            margin-bottom: 10px;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 5px;
+            color: #1b5e20;
+            font-weight: 600;
+        }
+
+        .subtitle {
+            text-align: center;
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 30px;
+        }
+
+        label {
+            font-size: 13px;
+            font-weight: 500;
+            color: #444;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            margin: 8px 0 18px 0;
+            border-radius: 10px;
+            border: 1px solid #ccc;
+            outline: none;
+            transition: 0.3s;
+        }
+
+        input:focus {
+            border-color: #26a69a;
+            box-shadow: 0 0 0 2px rgba(38, 166, 154, 0.2);
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 12px;
+            background: linear-gradient(120deg, #1b5e20, #26a69a);
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .mode-switch {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 18px;
+        }
+
+        .mode-btn {
+            padding: 10px;
+            border-radius: 10px;
+            border: 1px solid #cfd8dc;
+            background: #f7fbfa;
+            color: #1b5e20;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .mode-btn.active {
+            background: linear-gradient(120deg, #1b5e20, #26a69a);
+            color: #fff;
+            border-color: transparent;
+        }
+
+        .auth-panel {
+            display: none;
+        }
+
+        .auth-panel.active {
+            display: block;
+        }
+
+        .status-text {
+            font-size: 12px;
+            color: #2e7d32;
+            margin: -10px 0 12px 0;
+            min-height: 16px;
+        }
+
+        .hint {
+            font-size: 12px;
+            color: #607d8b;
+            margin: -12px 0 12px 0;
+        }
+
+        .mobile-row {
+            display: grid;
+            grid-template-columns: 104px 1fr;
+            gap: 10px;
+            align-items: end;
+        }
+
+        .mobile-row input {
+            margin: 8px 0 18px 0;
+        }
+
+        @media (max-width: 520px) {
+            .card {
+                width: calc(100% - 24px);
+                padding: 24px;
+            }
+        }
+
+        .footer {
+            text-align: center;
+            font-size: 13px;
+            margin-top: 20px;
+            color: #666;
+        }
+
+        .footer a {
+            color: #1b5e20;
+            font-weight: 500;
+            text-decoration: none;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
+    <link rel="stylesheet" href="css/modern-theme.css">
+
+    <!-- Firebase v8 -->
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-auth.js"></script>
+    <script src="js/number-localization.js"></script>
+
+    <script>
+        window.onload = function () {
+
+            // Keep auth navigation simple: back from this page returns to home.
+            history.pushState({ authPage: true }, "", location.href);
+            window.addEventListener("popstate", function () {
+                window.location.replace("index.html");
+            });
+
+            const firebaseConfig = {
+                apiKey: "AIzaSyAbdlXLeHw5cUyB9OnlhNuXZPQRbg8NID8",
+                authDomain: "efarm-dashboard.firebaseapp.com",
+                databaseURL: "https://efarm-dashboard-default-rtdb.firebaseio.com",
+                projectId: "efarm-dashboard",
+                storageBucket: "efarm-dashboard.appspot.com",
+                messagingSenderId: "395430854188",
+                appId: "1:395430854188:web:63f1da7c4cc93357addb89",
+                measurementId: "G-8HQ25GL1NN"
+            };
+
+            if (!firebase.apps.length) {
+                firebase.initializeApp(firebaseConfig);
+            }
+
+            const auth = firebase.auth();
+            const LANGUAGE_STORAGE_KEY = "smartagro_language";
+
+            let otpConfirmationResult = null;
+            let recaptchaVerifier = null;
+            let activeLang = "en";
+
+            const AUTH_I18N = {
+                en: {
+                    pageTitle: "Login | Digital Farming",
+                    appTitle: "Digital Farming",
+                    subtitle: "Login to transform traditional agriculture into smart insights",
+                    emailMode: "Email Login",
+                    mobileMode: "Mobile OTP",
+                    emailLabel: "Email",
+                    passwordLabel: "Password",
+                    loginBtn: "Login Securely",
+                    mobileLabel: "Mobile Number",
+                    mobileCodeLabel: "Country Code",
+                    mobileCodePlaceholder: "+91",
+                    mobileNumberLabel: "Number",
+                    mobileNumberPlaceholder: "9999999999",
+                    mobileHint: "Use country code format (for example +91...)",
+                    sendOtpBtn: "Send OTP",
+                    otpLabel: "OTP",
+                    otpPlaceholder: "Enter 6-digit OTP",
+                    verifyOtpBtn: "Verify OTP & Login",
+                    footerText: "Don’t have an account?",
+                    footerLink: "Create New Account",
+                    recaptchaFail: "Unable to initialize verification. Refresh and try again.",
+                    mobileRequired: "Enter a mobile number in international format, for example +919999999999",
+                    recaptchaNotReady: "Verification is not ready yet. Please wait a moment.",
+                    sendingOtp: "Sending OTP...",
+                    otpSent: "OTP sent successfully.",
+                    otpSendFail: "Failed to send OTP.",
+                    sendOtpFirst: "Send OTP first.",
+                    otpRequired: "Enter the OTP.",
+                    verifyingOtp: "Verifying OTP...",
+                    invalidOtp: "Invalid OTP. Please try again."
+                },
+                hi: {
+                    pageTitle: "लॉगिन | डिजिटल फार्मिंग",
+                    appTitle: "डिजिटल फार्मिंग",
+                    subtitle: "स्मार्ट जानकारी के लिए लॉगिन करें",
+                    emailMode: "ईमेल लॉगिन",
+                    mobileMode: "मोबाइल OTP",
+                    emailLabel: "ईमेल",
+                    passwordLabel: "पासवर्ड",
+                    loginBtn: "सुरक्षित लॉगिन",
+                    mobileLabel: "मोबाइल नंबर",
+                    mobileCodeLabel: "देश कोड",
+                    mobileCodePlaceholder: "+91",
+                    mobileNumberLabel: "नंबर",
+                    mobileNumberPlaceholder: "9999999999",
+                    mobileHint: "देश कोड के साथ नंबर लिखें (जैसे +91...)",
+                    sendOtpBtn: "OTP भेजें",
+                    otpLabel: "OTP",
+                    otpPlaceholder: "6 अंकों का OTP दर्ज करें",
+                    verifyOtpBtn: "OTP सत्यापित करें और लॉगिन करें",
+                    footerText: "क्या आपका खाता नहीं है?",
+                    footerLink: "नया खाता बनाएं",
+                    recaptchaFail: "वेरिफिकेशन शुरू नहीं हो सका। पेज रिफ्रेश करके फिर प्रयास करें।",
+                    mobileRequired: "अंतरराष्ट्रीय प्रारूप में मोबाइल नंबर दर्ज करें, जैसे +919999999999",
+                    recaptchaNotReady: "वेरिफिकेशन अभी तैयार नहीं है। कृपया थोड़ी देर बाद प्रयास करें।",
+                    sendingOtp: "OTP भेजा जा रहा है...",
+                    otpSent: "OTP सफलतापूर्वक भेजा गया।",
+                    otpSendFail: "OTP भेजने में विफल।",
+                    sendOtpFirst: "पहले OTP भेजें।",
+                    otpRequired: "OTP दर्ज करें।",
+                    verifyingOtp: "OTP सत्यापित किया जा रहा है...",
+                    invalidOtp: "OTP अमान्य है। कृपया फिर प्रयास करें।"
+                },
+                mr: {
+                    pageTitle: "लॉगिन | डिजिटल फार्मिंग",
+                    appTitle: "डिजिटल फार्मिंग",
+                    subtitle: "स्मार्ट माहितींसाठी लॉगिन करा",
+                    emailMode: "ईमेल लॉगिन",
+                    mobileMode: "मोबाइल OTP",
+                    emailLabel: "ईमेल",
+                    passwordLabel: "पासवर्ड",
+                    loginBtn: "सुरक्षित लॉगिन",
+                    mobileLabel: "मोबाइल क्रमांक",
+                    mobileCodeLabel: "देश कोड",
+                    mobileCodePlaceholder: "+91",
+                    mobileNumberLabel: "क्रमांक",
+                    mobileNumberPlaceholder: "9999999999",
+                    mobileHint: "देश कोडसह क्रमांक टाका (उदा. +91...)",
+                    sendOtpBtn: "OTP पाठवा",
+                    otpLabel: "OTP",
+                    otpPlaceholder: "6 अंकी OTP टाका",
+                    verifyOtpBtn: "OTP तपासा आणि लॉगिन करा",
+                    footerText: "खाते नाही का?",
+                    footerLink: "नवे खाते तयार करा",
+                    recaptchaFail: "व्हेरिफिकेशन सुरू होऊ शकले नाही. पृष्ठ रिफ्रेश करून पुन्हा प्रयत्न करा.",
+                    mobileRequired: "आंतरराष्ट्रीय स्वरूपात मोबाइल क्रमांक टाका, उदा. +919999999999",
+                    recaptchaNotReady: "व्हेरिफिकेशन अजून तयार नाही. कृपया थोडा वेळ थांबा.",
+                    sendingOtp: "OTP पाठवला जात आहे...",
+                    otpSent: "OTP यशस्वीरीत्या पाठवला.",
+                    otpSendFail: "OTP पाठवण्यात अयशस्वी.",
+                    sendOtpFirst: "प्रथम OTP पाठवा.",
+                    otpRequired: "OTP टाका.",
+                    verifyingOtp: "OTP तपासला जात आहे...",
+                    invalidOtp: "अवैध OTP. कृपया पुन्हा प्रयत्न करा."
+                }
+            };
+
+            function getCurrentLanguage() {
+                const lang = localStorage.getItem(LANGUAGE_STORAGE_KEY) || "en";
+                return AUTH_I18N[lang] ? lang : "en";
+            }
+
+            function tAuth(key) {
+                return (AUTH_I18N[activeLang] && AUTH_I18N[activeLang][key]) || AUTH_I18N.en[key] || key;
+            }
+
+            function applyLanguage(lang) {
+                activeLang = AUTH_I18N[lang] ? lang : "en";
+                document.documentElement.lang = activeLang;
+                document.title = tAuth("pageTitle");
+
+                document.querySelectorAll("[data-i18n]").forEach(function (el) {
+                    const key = el.getAttribute("data-i18n");
+                    if (!key) return;
+                    el.textContent = tAuth(key);
+                });
+
+                const mobileCodeInput = document.getElementById("mobileCode");
+                if (mobileCodeInput) mobileCodeInput.placeholder = tAuth("mobileCodePlaceholder");
+
+                const mobileNumberInput = document.getElementById("mobileNumber");
+                if (mobileNumberInput) mobileNumberInput.placeholder = tAuth("mobileNumberPlaceholder");
+
+                const otpInput = document.getElementById("otp");
+                if (otpInput) otpInput.placeholder = tAuth("otpPlaceholder");
+            }
+
+            const emailModeBtn = document.getElementById("emailModeBtn");
+            const mobileModeBtn = document.getElementById("mobileModeBtn");
+            const emailPanel = document.getElementById("emailPanel");
+            const mobilePanel = document.getElementById("mobilePanel");
+            const sendOtpBtn = document.getElementById("sendOtpBtn");
+            const verifyOtpBtn = document.getElementById("verifyOtpBtn");
+            const otpWrap = document.getElementById("otpWrap");
+            const otpStatus = document.getElementById("otpStatus");
+            const recaptchaContainer = document.getElementById("recaptcha-container");
+
+            function initRecaptcha() {
+                if (recaptchaVerifier) return;
+                recaptchaVerifier = new firebase.auth.RecaptchaVerifier("recaptcha-container", {
+                    size: "invisible"
+                });
+
+                recaptchaVerifier.render().catch(() => {
+                    otpStatus.textContent = tAuth("recaptchaFail");
+                });
+            }
+
+            function showAuthPanel(mode) {
+                const isEmail = mode === "email";
+                emailModeBtn.classList.toggle("active", isEmail);
+                mobileModeBtn.classList.toggle("active", !isEmail);
+                emailPanel.classList.toggle("active", isEmail);
+                mobilePanel.classList.toggle("active", !isEmail);
+
+                if (!isEmail) {
+                    initRecaptcha();
+                }
+            }
+
+            document.getElementById("loginForm").addEventListener("submit", function (event) {
+                event.preventDefault();
+
+                const email = document.getElementById("email").value;
+                const password = document.getElementById("password").value;
+
+                auth.signInWithEmailAndPassword(email, password)
+                    .then(() => {
+                        window.location.href = "dashboard.html";
+                    })
+                    .catch((error) => {
+                        alert(error.message);
+                    });
+            });
+
+            sendOtpBtn.addEventListener("click", function () {
+                const codeRaw = document.getElementById("mobileCode").value.trim();
+                const numberRaw = document.getElementById("mobileNumber").value.trim();
+                const code = codeRaw.startsWith("+") ? codeRaw : `+${codeRaw}`;
+                const normalizedCode = code.replace(/[^+0-9]/g, "");
+                const normalizedNumber = numberRaw.replace(/[^0-9]/g, "");
+                const mobile = `${normalizedCode}${normalizedNumber}`;
+
+                if (!normalizedCode || normalizedCode === "+" || !normalizedNumber) {
+                    alert(tAuth("mobileRequired"));
+                    return;
+                }
+
+                if (!recaptchaVerifier) {
+                    otpStatus.textContent = tAuth("recaptchaNotReady");
+                    return;
+                }
+
+                otpStatus.textContent = tAuth("sendingOtp");
+                auth.signInWithPhoneNumber(mobile, recaptchaVerifier)
+                    .then((confirmationResult) => {
+                        otpConfirmationResult = confirmationResult;
+                        otpWrap.style.display = "block";
+                        otpStatus.textContent = tAuth("otpSent");
+                    })
+                    .catch((error) => {
+                        otpStatus.textContent = tAuth("otpSendFail");
+                        alert(error.message);
+                        if (recaptchaVerifier) {
+                            recaptchaVerifier.clear();
+                            recaptchaVerifier = null;
+                        }
+                        recaptchaContainer.innerHTML = "";
+                        showAuthPanel("mobile");
+                    });
+            });
+
+            verifyOtpBtn.addEventListener("click", function () {
+                const otp = document.getElementById("otp").value.trim();
+                if (!otpConfirmationResult) {
+                    alert(tAuth("sendOtpFirst"));
+                    return;
+                }
+                if (!otp) {
+                    alert(tAuth("otpRequired"));
+                    return;
+                }
+
+                otpStatus.textContent = tAuth("verifyingOtp");
+                otpConfirmationResult.confirm(otp)
+                    .then(() => {
+                        window.location.href = "dashboard.html";
+                    })
+                    .catch((error) => {
+                        otpStatus.textContent = tAuth("invalidOtp");
+                        alert(error.message);
+                    });
+            });
+
+            emailModeBtn.addEventListener("click", function () {
+                showAuthPanel("email");
+            });
+
+            mobileModeBtn.addEventListener("click", function () {
+                showAuthPanel("mobile");
+            });
+
+            applyLanguage(getCurrentLanguage());
+            initRecaptcha();
+            showAuthPanel("email");
+
+            document.addEventListener("language-changed", function (event) {
+                const lang = event && event.detail && event.detail.lang ? event.detail.lang : getCurrentLanguage();
+                applyLanguage(lang);
+            });
+
+            firebase.auth().onAuthStateChanged(function (user) {
+                if (user) {
+                    window.location.href = "dashboard.html";
+                }
+            });
+        };
+    </script>
+</head>
+
+<body class="auth-page">
+
+    <div class="card">
+
+        <div class="mode-switch">
+            <button type="button" id="emailModeBtn" class="mode-btn active" data-i18n="emailMode">Email Login</button>
+            <button type="button" id="mobileModeBtn" class="mode-btn" data-i18n="mobileMode">Mobile OTP</button>
+        </div>
+
+        <div id="emailPanel" class="auth-panel active">
+            <form id="loginForm">
+                <label data-i18n="emailLabel">Email</label>
+                <input type="email" id="email" required>
+
+                <label data-i18n="passwordLabel">Password</label>
+                <input type="password" id="password" required>
+
+                <button type="submit" data-i18n="loginBtn">Login Securely</button>
+            </form>
+        </div>
+
+        <div id="mobilePanel" class="auth-panel">
+            <label data-i18n="mobileLabel">Mobile Number</label>
+            <div class="mobile-row">
+                <div>
+                    <label data-i18n="mobileCodeLabel">Country Code</label>
+                    <input type="text" id="mobileCode" value="+91" placeholder="+91" inputmode="tel" autocomplete="tel-country-code">
+                </div>
+                <div>
+                    <label data-i18n="mobileNumberLabel">Number</label>
+                    <input type="tel" id="mobileNumber" placeholder="9999999999" inputmode="tel" autocomplete="tel-national">
+                </div>
+            </div>
+            <div class="hint" data-i18n="mobileHint">Use country code format (for example +91...)</div>
+
+            <div id="recaptcha-container" style="position:absolute;left:-10000px;top:auto;width:1px;height:1px;overflow:hidden;"></div>
+
+            <button type="button" id="sendOtpBtn" style="margin-bottom:12px;" data-i18n="sendOtpBtn">Send OTP</button>
+
+            <div id="otpWrap" style="display:none;">
+                <label data-i18n="otpLabel">OTP</label>
+                <input type="text" id="otp" placeholder="Enter 6-digit OTP">
+                <button type="button" id="verifyOtpBtn" data-i18n="verifyOtpBtn">Verify OTP & Login</button>
+            </div>
+
+            <div id="otpStatus" class="status-text"></div>
+        </div>
+
+        <div class="footer">
+            <span data-i18n="footerText">Don’t have an account?</span>
+            <a href="Register.html" data-i18n="footerLink">Create New Account</a>
+        </div>
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,384 @@
+/* =========================================================
+   CALENDAR PAGE (SCOPED ONLY)
+========================================================= */
+
+.calendar-page{
+  background:#f4f7f6;
+  min-height:100vh;
+}
+
+/* Utility */
+.hide{ display:none !important; }
+
+/* Theme variables */
+:root{
+  --green-dark:#1b5e20;
+  --green-light:#e8f5e9;
+  --green-accent:#66bb6a;
+  --blue:#1976d2;
+  --red:#e53935;
+}
+
+/* =========================================================
+   CALENDAR CONTROL BAR
+========================================================= */
+
+.calendar-controls{
+  display:flex;
+  align-items:center;
+  gap:16px;
+  padding:16px 20px;
+  margin:20px;
+  background:#ffffff;
+  border-radius:16px;
+  box-shadow:0 6px 20px rgba(0,0,0,0.08);
+  flex-wrap:wrap;
+}
+
+/* Title */
+.cal-title{
+  font-size:18px;
+  font-weight:600;
+  color:var(--green-dark);
+  white-space:nowrap;
+}
+
+/* Month / Year Navigation */
+.cal-nav{
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+
+/* Month & Year selector */
+.cal-nav select,
+.cal-nav input[type="number"]{
+  height:36px;
+  padding:0 12px;
+  border-radius:10px;
+  border:1px solid #c8e6c9;
+  background:#f1f8f4;
+  font-size:14px;
+  color:var(--green-dark);
+  outline:none;
+  transition:0.2s;
+}
+
+.cal-nav select:hover,
+.cal-nav input[type="number"]:hover{
+  background:var(--green-light);
+}
+
+.cal-nav select:focus,
+.cal-nav input[type="number"]:focus{
+  border-color:var(--green-accent);
+  box-shadow:0 0 0 2px rgba(102,187,106,0.25);
+}
+
+/* Remove number spinner */
+.cal-nav input[type="number"]::-webkit-inner-spin-button,
+.cal-nav input[type="number"]::-webkit-outer-spin-button{
+  -webkit-appearance:none;
+  margin:0;
+}
+.cal-nav input[type="number"]{
+  -moz-appearance:textfield;
+  width:90px;
+  text-align:center;
+}
+
+/* Navigation arrows */
+.cal-nav input[type="button"]{
+  width:34px;
+  height:34px;
+  border-radius:50%;
+  border:none;
+  background:var(--green-dark);
+  color:#fff;
+  font-size:16px;
+  cursor:pointer;
+  transition:0.2s;
+}
+
+.cal-nav input[type="button"]:hover{
+  background:#2e7d32;
+}
+
+/* Action buttons */
+.cal-actions{
+  display:flex;
+  gap:10px;
+}
+
+.cal-actions .primary{
+  background:var(--blue);
+  color:#fff;
+  border:none;
+  padding:8px 16px;
+  border-radius:10px;
+  cursor:pointer;
+}
+
+.cal-actions .danger{
+  background:var(--red);
+  color:#fff;
+  border:none;
+  padding:8px 16px;
+  border-radius:10px;
+  cursor:pointer;
+}
+
+#cancelAllBtn:disabled{
+  background:#b0b0b0 !important;
+  cursor:not-allowed;
+  box-shadow:none;
+  opacity:0.7;
+}
+
+
+/* View toggle */
+.view-toggle{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  font-size:13px;
+  font-weight:600;
+  color:var(--green-dark);
+}
+
+/* Switch */
+.switch{
+  position:relative;
+  width:64px;
+  height:34px;
+}
+.switch input{
+  opacity:0;
+  width:0;
+  height:0;
+}
+.slider{
+  position:absolute;
+  inset:0;
+  cursor:pointer;
+  background:#cfd8dc;
+  border-radius:34px;
+  transition:0.3s;
+}
+.slider::before{
+  content:"";
+  position:absolute;
+  width:26px;
+  height:26px;
+  left:4px;
+  bottom:4px;
+  background:#fff;
+  border-radius:50%;
+  transition:0.3s;
+}
+.switch input:checked + .slider{
+  background:#4caf50;
+}
+.switch input:checked + .slider::before{
+  transform:translateX(30px);
+}
+
+/* =========================================================
+   CALENDAR GRID
+========================================================= */
+
+.calendar-wrapper{
+  margin:0 20px;
+}
+
+.calHead,
+.calRow{
+  display:flex;
+}
+
+.calCell{
+  width:14.2857%;
+}
+
+/* Header */
+.calHead .calCell{
+  background:var(--green-light);
+  color:var(--green-dark);
+  font-weight:600;
+  text-align:center;
+  padding:12px 0;
+  border-bottom:1px solid #c8e6c9;
+}
+
+/* Body */
+.calBody .calCell{
+  border:1px solid #e0e0e0;
+  min-height:90px;
+  background:#fff;
+  cursor:pointer;
+  transition:background 0.2s;
+}
+
+.calBody .calCell:hover{
+  background:#f1f8e9;
+}
+
+.calBlank{
+  background:#eeeeee;
+  cursor:default;
+}
+
+.calToday{
+  border:2px solid var(--green-accent);
+}
+
+.cellDate{
+  font-size:13px;
+  font-weight:600;
+  color:#333;
+  padding:6px;
+}
+
+/* =========================================================
+   EVENT BADGES
+========================================================= */
+
+.evt{
+  margin:4px 6px;
+  font-size:11px;
+  padding:4px 6px;
+  border-radius:6px;
+  text-align:center;
+  font-weight:500;
+  background:#e8f5e9;
+  color:var(--green-dark);
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+.evt.single{ background:#e3f2fd; color:#0d47a1; }
+.evt.monthly{ background:#fff3e0; color:#e65100; }
+.evt.weekly{ background:#ede7f6; color:#4527a0; }
+.evt.scheduled{ background:#fff3cd; color:#856404; }
+.evt.running{ background:#ffe0b2; color:#e65100; }
+.evt.done{ background:#d4edda; color:#155724; }
+.evt.conflict{ border:2px solid red; }
+
+/* =========================================================
+   EVENT FORM (DIALOG)
+========================================================= */
+
+#calForm{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.55);
+  border:none;
+  padding:0;
+  z-index:2000;
+}
+
+#calForm[open]{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+#calForm form{
+  width:420px;
+  padding:25px;
+  border-radius:18px;
+  background:#fff;
+  box-shadow:0 25px 50px rgba(0,0,0,0.3);
+}
+
+#calForm h2{
+  margin-top:0;
+  color:var(--green-dark);
+}
+
+#calForm label{
+  font-weight:500;
+  color:#555;
+  margin-top:12px;
+  display:block;
+}
+
+#calForm input,
+#calForm select{
+  width:100%;
+  padding:10px;
+  margin-top:6px;
+  border-radius:10px;
+  border:1px solid #ccc;
+  font-size:14px;
+}
+
+#calForm .actions{
+  display:flex;
+  justify-content:flex-end;
+  gap:10px;
+  margin-top:16px;
+}
+
+#calForm button{
+  padding:10px 16px;
+  border:none;
+  border-radius:10px;
+  font-size:14px;
+  cursor:pointer;
+}
+
+#calForm .save{
+  background:linear-gradient(120deg,#1b5e20,#26a69a);
+  color:#fff;
+}
+
+#calForm .cancel{
+  background:#ccc;
+}
+
+/* =========================================================
+   HISTORY VIEW
+========================================================= */
+
+.history-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin:20px;
+}
+
+.history-header button{
+  padding:8px 14px;
+  border-radius:6px;
+  border:none;
+  background:var(--green-dark);
+  color:#fff;
+  cursor:pointer;
+}
+
+.history-table-wrapper{
+  margin:0 20px 40px;
+  max-height:400px;
+  overflow-y:auto;
+}
+
+#historyTable{
+  width:100%;
+  border-collapse:collapse;
+  font-size:14px;
+}
+
+#historyTable th,
+#historyTable td{
+  border:1px solid #ddd;
+  padding:8px;
+  text-align:center;
+}
+
+#historyTable th{
+  background:#f1f1f1;
+  position:sticky;
+  top:0;
+}

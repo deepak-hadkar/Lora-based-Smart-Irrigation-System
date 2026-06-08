@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Irrigation Scheduler | SmartAgro</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/calendar.css">
+<link rel="stylesheet" href="css/modern-theme.css">
+</head>
+
+<body class="calendar-page">
+
+<!-- NAVBAR -->
+<div id="navbar"></div>
+
+<!-- CONTROLS -->
+<div class="calendar-controls">
+  <div class="cal-title" id="calTitle">Scheduler</div>
+
+  <div class="cal-nav">
+    <input id="calBack" type="button" value="‹">
+    <select id="calMonth"></select>
+    <input type="text" id="calYear" inputmode="numeric" autocomplete="off">
+    <input id="calNext" type="button" value="›">
+  </div>
+
+  <div class="cal-actions">
+    <button id="cancelAllBtn" class="danger">Cancel All</button>
+    <button id="simulateBtn" class="primary">Simulate</button>
+  </div>
+
+  <div class="view-toggle">
+    <span id="calendarLabel">Calendar</span>
+    <label class="switch">
+      <input type="checkbox" id="viewSwitch">
+      <span class="slider"></span>
+    </label>
+    <span id="historyLabel">History</span>
+  </div>
+</div>
+
+<!-- CALENDAR -->
+<div id="calendarView">
+  <div class="calendar-wrapper">
+    <div id="calWrap"></div>
+  </div>
+</div>
+
+<!-- FORM -->
+<dialog id="calForm">
+  <form id="scheduleForm">
+    <h2 id="scheduleFormTitle">Schedule Watering</h2>
+
+    <label id="dateLabel">Date</label>
+    <input id="evtDate" readonly>
+
+    <label id="scheduleTypeLabel">Schedule Type</label>
+    <select id="scheduleType">
+      <option value="single" id="scheduleTypeSingle">Single Date</option>
+      <option value="month" id="scheduleTypeMonth">Entire Month</option>
+      <option value="weekdays" id="scheduleTypeWeekdays">Specific Weekdays</option>
+    </select>
+
+    <div id="weekdayOptions" class="weekdays hide">
+      <label><input type="checkbox" value="0"><span id="weekdaySunday">Sunday</span></label>
+      <label><input type="checkbox" value="1"><span id="weekdayMonday">Monday</span></label>
+      <label><input type="checkbox" value="2"><span id="weekdayTuesday">Tuesday</span></label>
+      <label><input type="checkbox" value="3"><span id="weekdayWednesday">Wednesday</span></label>
+      <label><input type="checkbox" value="4"><span id="weekdayThursday">Thursday</span></label>
+      <label><input type="checkbox" value="5"><span id="weekdayFriday">Friday</span></label>
+      <label><input type="checkbox" value="6"><span id="weekdaySaturday">Saturday</span></label>
+    </div>
+
+    <label id="valveOnLabel">Valve ON</label>
+    <input type="text" id="event-start-time" inputmode="numeric" autocomplete="off" placeholder="HH:MM">
+
+    <label id="valveOffLabel">Valve OFF</label>
+    <input type="text" id="event-end-time" inputmode="numeric" autocomplete="off" placeholder="HH:MM">
+
+    <div class="actions">
+      <button type="button" class="cancel" id="cancelBtn">Cancel</button>
+      <button type="submit" class="save" id="saveBtn">Save</button>
+      <button type="button" class="cancel hide" id="deleteBtn">Cancel Schedule</button>
+    </div>
+  </form>
+</dialog>
+
+<!-- HISTORY -->
+<div id="historyView" class="hide">
+  <div class="history-header">
+    <h2 id="historyTitle">Irrigation History</h2>
+    <button id="exportCsvBtn">Export CSV</button>
+  </div>
+
+  <div class="history-table-wrapper">
+    <table id="historyTable">
+      <thead>
+        <tr>
+          <th id="historyDateHead">Date</th>
+          <th id="historyOnHead">ON</th>
+          <th id="historyOffHead">OFF</th>
+          <th id="historySourceHead">Source</th>
+          <th id="historyStatusHead">Status</th>
+          <th id="historyCompletedHead">Completed</th>
+          <th id="historyDurationHead">Duration</th>
+        </tr>
+      </thead>
+      <tbody id="historyBody"></tbody>
+    </table>
+  </div>
+</div>
+
+<footer>© 2025 SmartAgro</footer>
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-database.js"></script>
+
+<script src="js/firebase-init.js"></script>
+<script src="js/navbar.js"></script>
+<script src="js/number-localization.js"></script>
+<script src="js/calendar.js"></script>
+
+</body>
+</html>

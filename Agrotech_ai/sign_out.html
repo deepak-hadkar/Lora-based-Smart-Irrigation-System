@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Logging out | SmartAgro</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- Google Font -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+<style>
+*{
+  box-sizing:border-box;
+  font-family:'Poppins',sans-serif;
+}
+
+body{
+  margin:0;
+  height:100vh;
+  background:linear-gradient(120deg,#1b5e20,#26a69a);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.card{
+  background:#fff;
+  width:400px;
+  padding:35px;
+  border-radius:20px;
+  box-shadow:0 25px 50px rgba(0,0,0,.25);
+  text-align:center;
+}
+
+.icon{
+  font-size:46px;
+  margin-bottom:10px;
+}
+
+h1{
+  margin:10px 0;
+  font-weight:600;
+  color:#1b5e20;
+}
+
+p{
+  font-size:14px;
+  color:#555;
+  margin-bottom:25px;
+}
+
+button{
+  width:100%;
+  padding:14px;
+  border:none;
+  border-radius:12px;
+  background:linear-gradient(120deg,#1b5e20,#26a69a);
+  color:white;
+  font-size:16px;
+  cursor:pointer;
+}
+
+.tagline{
+  margin-top:20px;
+  font-size:12px;
+  color:#777;
+}
+</style>
+<link rel="stylesheet" href="css/modern-theme.css">
+
+<!-- Firebase v8 -->
+<script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-auth.js"></script>
+<script src="js/number-localization.js"></script>
+
+<script>
+window.onload = function () {
+  const LANGUAGE_STORAGE_KEY = "smartagro_language";
+  let activeLang = "en";
+
+  const SIGNOUT_I18N = {
+    en: {
+      pageTitle: "Logging out | SmartAgro",
+      heading: "Signing Out",
+      body: "You are safely logging out of SmartAgro.",
+      logoutBtn: "Logout Securely",
+      tagline: "From soil to software - empowering modern farmers"
+    },
+    hi: {
+      pageTitle: "लॉगआउट | स्मार्टएग्रो",
+      heading: "साइन आउट",
+      body: "आप SmartAgro से सुरक्षित रूप से लॉग आउट हो रहे हैं।",
+      logoutBtn: "सुरक्षित लॉगआउट",
+      tagline: "मिट्टी से सॉफ्टवेयर तक - आधुनिक किसानों को सशक्त बनाना"
+    },
+    mr: {
+      pageTitle: "लॉगआउट | स्मार्टअ‍ॅग्रो",
+      heading: "साइन आउट",
+      body: "आपण SmartAgro मधून सुरक्षितपणे लॉग आउट होत आहात.",
+      logoutBtn: "सुरक्षित लॉगआउट",
+      tagline: "मातीपासून सॉफ्टवेअरपर्यंत - आधुनिक शेतकऱ्यांना सक्षम करत"
+    }
+  };
+
+  function getCurrentLanguage() {
+    const lang = localStorage.getItem(LANGUAGE_STORAGE_KEY) || "en";
+    return SIGNOUT_I18N[lang] ? lang : "en";
+  }
+
+  function tSignOut(key) {
+    return (SIGNOUT_I18N[activeLang] && SIGNOUT_I18N[activeLang][key]) || SIGNOUT_I18N.en[key] || key;
+  }
+
+  function applyLanguage(lang) {
+    activeLang = SIGNOUT_I18N[lang] ? lang : "en";
+    document.documentElement.lang = activeLang;
+    document.title = tSignOut("pageTitle");
+    document.querySelectorAll("[data-i18n]").forEach(function (el) {
+      const key = el.getAttribute("data-i18n");
+      if (!key) return;
+      el.textContent = tSignOut(key);
+    });
+  }
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyAbdlXLeHw5cUyB9OnlhNuXZPQRbg8NID8",
+    authDomain: "efarm-dashboard.firebaseapp.com",
+    projectId: "efarm-dashboard"
+  };
+
+  if (!firebase.apps.length) {
+    firebase.initializeApp(firebaseConfig);
+  }
+
+  const auth = firebase.auth();
+
+  applyLanguage(getCurrentLanguage());
+  document.addEventListener("language-changed", function (event) {
+    const lang = event && event.detail && event.detail.lang ? event.detail.lang : getCurrentLanguage();
+    applyLanguage(lang);
+  });
+
+  document.getElementById("logoutBtn").onclick = function () {
+    auth.signOut().then(() => {
+      // Redirect to HOME page
+      window.location.replace("index.html");
+    }).catch(() => {
+      window.location.replace("index.html");
+    });
+  };
+};
+</script>
+</head>
+
+<body class="auth-page">
+
+<div class="card">
+  <div class="icon">SA</div>
+  <h1 data-i18n="heading">Signing Out</h1>
+  <p>
+    <span data-i18n="body">You are safely logging out of SmartAgro.</span>
+  </p>
+
+  <button type="button" id="logoutBtn" data-i18n="logoutBtn">Logout Securely</button>
+
+  <div class="tagline">
+    <span data-i18n="tagline">From soil to software - empowering modern farmers</span>
+  </div>
+</div>
+
+</body>
+</html>

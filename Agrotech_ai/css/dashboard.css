@@ -1,0 +1,470 @@
+/* ================= PAGE ================= */
+.page {
+  width: min(1400px, 100%);
+  margin: 0 auto;
+  padding: clamp(12px, 2.2vw, 24px);
+}
+
+.dashboard-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.dashboard-head-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.dashboard-head-actions.hide,
+.device-toggle-box.hide {
+  display: none;
+}
+
+.dashboard-head h1 {
+  margin: 0;
+}
+
+.refresh-btn {
+  border: none;
+  border-radius: 12px;
+  padding: 10px 14px;
+  cursor: pointer;
+  background: #1b5e20;
+  color: #fff;
+  font-size: clamp(12px, 1.4vw, 13px);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.refresh-btn.secondary {
+  background: #2e7d32;
+}
+
+.refresh-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.dashboard {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.empty-state {
+  background: #ffffff;
+  border-radius: 18px;
+  padding: 24px;
+  box-shadow: 0 10px 26px rgba(0,0,0,.08);
+  text-align: center;
+}
+
+.empty-state h3 {
+  margin: 0 0 8px;
+  color: #1b5e20;
+}
+
+.empty-state p {
+  margin: 0;
+  color: #555;
+  font-size: 14px;
+}
+
+.empty-note {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 10px 14px;
+  font-size: 13px;
+  color: #555;
+  box-shadow: 0 4px 12px rgba(0,0,0,.08);
+}
+
+/* ================= DEVICE CONTAINER ================= */
+.device-box {
+  background: #ffffff;
+  border-radius: 18px;
+  padding: 18px;
+  box-shadow: 0 10px 26px rgba(0,0,0,.08);
+}
+
+.device-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.device-header h2 {
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0;
+  color: #1b5e20;
+}
+
+.device-header button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  color: #1b5e20;
+}
+
+/* ================= DEVICE TOGGLES ================= */
+.device-toggle-box {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 18px;
+}
+
+.device-toggle-box label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #ffffff;
+  padding: 8px 14px;
+  border-radius: 20px;
+  box-shadow: 0 4px 12px rgba(0,0,0,.08);
+  font-size: 13px;
+  cursor: pointer;
+}
+
+/* ================= CARD GRID ================= */
+.cards {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+/* ================= CARD ================= */
+.card {
+  position: relative;
+  background: #f6f9f7;
+  border-radius: 14px;
+  padding: 14px;
+  text-align: left;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  column-gap: 12px;
+  width: fit-content;
+  min-width: 170px;
+  max-width: 100%;
+  cursor: default;
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  min-height: 20px;
+  padding-left: 0;
+  text-align: left;
+  word-break: break-word;
+}
+
+.card-value {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  text-align: right;
+  min-height: 22px;
+  width: auto;
+}
+
+.card-value .toggle,
+.card-value input[type="number"] {
+  margin-top: 0;
+}
+
+@media (max-width: 520px) {
+  .cards {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .card {
+    width: 100%;
+    min-width: 0;
+    grid-template-columns: 1fr;
+    row-gap: 6px;
+  }
+
+  .card-header {
+    justify-content: center;
+    text-align: center;
+  }
+
+  .card-value {
+    justify-content: center;
+    text-align: center;
+    width: 100%;
+  }
+}
+
+.drag-handle {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  border: 1px solid #c9ddca;
+  background: #ffffff;
+  color: #1b5e20;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: grab;
+  font-size: 13px;
+  line-height: 1;
+}
+
+.drag-handle:active {
+  cursor: grabbing;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0,0,0,.12);
+}
+
+.card h4 {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 500;
+  color: #555;
+}
+
+.card .value {
+  margin-top: 6px;
+  font-size: 22px;
+  font-weight: 600;
+  color: #1b5e20;
+}
+
+/* ================= THRESHOLD INPUT ================= */
+.card input[type="number"] {
+  margin-top: 6px;
+  width: min(140px, 100%);
+  padding: 6px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+  text-align: center;
+}
+
+/* ================= TOGGLE BUTTON ================= */
+.toggle {
+  margin-top: 6px;
+  padding: 6px 16px;
+  border-radius: 20px;
+  border: none;
+  font-weight: 600;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.toggle.on {
+  background: #4caf50;
+  color: #fff;
+}
+
+.toggle.off {
+  background: #e53935;
+  color: #fff;
+}
+
+/* ================= DRAG STATES ================= */
+.card.dragging {
+  opacity: 0.4;
+}
+
+.drag-ghost {
+  background: #e8f5e9;
+  border: 2px dashed #66bb6a;
+}
+
+/* ================= MODAL ================= */
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+}
+
+.modal.hide {
+  display: none;
+}
+
+.modal-box {
+  width: min(560px, 92vw);
+  max-height: 88vh;
+  overflow-y: auto;
+  background: #ffffff;
+  border-radius: 18px;
+  padding: 20px;
+  box-shadow: 0 20px 40px rgba(0,0,0,.3);
+}
+
+.modal-box h3 {
+  margin-top: 0;
+  margin-bottom: 12px;
+  font-size: 18px;
+  color: #1b5e20;
+}
+
+.modal-box label {
+  font-size: 13px;
+  font-weight: 500;
+  display: block;
+  margin-top: 10px;
+}
+
+.modal-box input {
+  width: 100%;
+  padding: 8px;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+  margin-top: 4px;
+}
+
+.modal-box select {
+  width: 100%;
+  padding: 8px;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+  margin-top: 4px;
+  background: #fff;
+}
+
+/* ================= CARD OPTIONS ================= */
+.card-options {
+  margin-top: 14px;
+}
+
+.card-option {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+  font-size: 13px;
+  margin-bottom: 10px;
+  background: #f6f9f7;
+  border-radius: 10px;
+  padding: 10px;
+}
+
+.card-option-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.card-option-title {
+  font-weight: 600;
+  color: #234;
+}
+
+.card-option-controls {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.card-option-controls input,
+.card-option-controls select {
+  margin-top: 0;
+}
+
+.card-option .remove-card {
+  border: none;
+  border-radius: 8px;
+  padding: 6px 10px;
+  background: #ef5350;
+  color: #fff;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.add-card-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px;
+}
+
+.add-card-row button {
+  border: none;
+  border-radius: 10px;
+  background: #2e7d32;
+  color: #fff;
+  padding: 0 14px;
+  cursor: pointer;
+}
+
+/* ================= MODAL ACTIONS ================= */
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.modal-actions button {
+  padding: 8px 16px;
+  border-radius: 20px;
+  border: none;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.modal-actions .primary {
+  background: #1b5e20;
+  color: #fff;
+}
+
+.modal-actions .danger {
+  background: #d32f2f;
+  color: #fff;
+  margin-right: auto;
+}
+
+@media (max-width: 768px) {
+  .dashboard-head {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .dashboard-head-actions {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+
+  .refresh-btn {
+    flex: 1 1 100%;
+  }
+
+  .card-option-controls {
+    grid-template-columns: 1fr;
+  }
+
+  .modal-actions {
+    flex-wrap: wrap;
+  }
+
+  .device-header h2 {
+    font-size: 16px;
+  }
+}

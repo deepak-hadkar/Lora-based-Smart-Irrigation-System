@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Dashboard | SmartAgro</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+<!-- GLOBAL + DASHBOARD CSS -->
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/dashboard.css">
+<link rel="stylesheet" href="css/modern-theme.css">
+
+<!-- Firebase -->
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-database.js"></script>
+
+<!-- App Core -->
+<script src="js/firebase-init.js"></script>
+<script src="js/navbar.js"></script>
+<script src="js/number-localization.js"></script>
+<script src="js/dashboard.js" defer></script>
+</head>
+
+<body class="dashboard-page">
+
+<!-- NAVBAR -->
+<div id="navbar"></div>
+
+<div class="page">
+
+  <div class="dashboard-head">
+    <h1 id="dashboardTitle">Dashboard</h1>
+    <div class="dashboard-head-actions">
+      <button id="addDashboardDeviceBtn" class="refresh-btn secondary" type="button">Add Device</button>
+    </div>
+  </div>
+
+  <!-- DEVICE VISIBILITY TOGGLES -->
+  <div id="deviceToggles" class="device-toggle-box"></div>
+
+  <!-- DASHBOARD CONTENT -->
+  <div id="dashboard" class="dashboard"></div>
+
+</div>
+
+<!-- DEVICE CUSTOMIZE MODAL -->
+<div id="customizeModal" class="modal hide">
+  <div class="modal-box">
+
+    <h3 id="customizeTitle">Customize Device</h3>
+
+    <label id="customizeDeviceNameLabel">Device Name</label>
+    <input id="deviceNameInput" />
+
+    <label for="deviceTypeInput" id="customizeDeviceTypeLabel">Device Type</label>
+    <select id="deviceTypeInput"></select>
+
+    <div id="cardOptions" class="card-options"></div>
+
+    <label for="addCardSelect" id="customizeAddCardLabel">Add New Card</label>
+    <div class="add-card-row">
+      <select id="addCardSelect"></select>
+      <button id="addCardBtn" type="button">Add Card</button>
+    </div>
+
+    <div class="modal-actions">
+      <button class="danger" id="removeDeviceBtn" onclick="removeActiveDeviceFromDashboard()">Remove Device</button>
+      <button id="customizeCancelBtn" onclick="closeCustomize()">Cancel</button>
+      <button class="primary" id="customizeSaveBtn" onclick="saveCustomize()">Save</button>
+    </div>
+
+  </div>
+</div>
+
+<!-- ADD DEVICE MODAL -->
+<div id="addDeviceModal" class="modal hide">
+  <div class="modal-box">
+    <h3 id="addDeviceModalTitle">Add Device To Dashboard</h3>
+
+    <label for="addDeviceSelect" id="addDeviceLabel">Device</label>
+    <select id="addDeviceSelect"></select>
+
+    <label for="addDeviceNameInput" id="addDeviceDisplayNameLabel">Display Name (optional)</label>
+    <input id="addDeviceNameInput" placeholder="Use custom dashboard name" />
+
+    <label for="addDeviceTypeSelect" id="addDeviceTypeLabel">Device Type</label>
+    <select id="addDeviceTypeSelect"></select>
+
+    <label id="cardsToShowLabel">Cards To Show</label>
+    <div id="addDeviceCardChoices" class="card-options"></div>
+
+    <p id="addDeviceEmptyMsg" class="empty-note hide">No available devices to add.</p>
+
+    <div class="modal-actions">
+      <button type="button" id="addDeviceCancelBtn" onclick="closeAddDeviceModal()">Cancel</button>
+      <button id="saveAddDeviceBtn" class="primary" type="button" onclick="saveAddDevice()">Add</button>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
