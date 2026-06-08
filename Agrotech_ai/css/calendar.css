@@ -5,6 +5,8 @@
 .calendar-page{
   background:#f4f7f6;
   min-height:100vh;
+  font-size:clamp(15px, 0.5vw + 13px, 18px);
+  line-height:1.45;
 }
 
 /* Utility */
@@ -37,7 +39,7 @@
 
 /* Title */
 .cal-title{
-  font-size:18px;
+  font-size:1.2rem;
   font-weight:600;
   color:var(--green-dark);
   white-space:nowrap;
@@ -52,25 +54,28 @@
 
 /* Month & Year selector */
 .cal-nav select,
-.cal-nav input[type="number"]{
+.cal-nav input[type="number"],
+.cal-nav input[type="text"]{
   height:36px;
   padding:0 12px;
   border-radius:10px;
   border:1px solid #c8e6c9;
   background:#f1f8f4;
-  font-size:14px;
+  font-size:1rem;
   color:var(--green-dark);
   outline:none;
   transition:0.2s;
 }
 
 .cal-nav select:hover,
-.cal-nav input[type="number"]:hover{
+.cal-nav input[type="number"]:hover,
+.cal-nav input[type="text"]:hover{
   background:var(--green-light);
 }
 
 .cal-nav select:focus,
-.cal-nav input[type="number"]:focus{
+.cal-nav input[type="number"]:focus,
+.cal-nav input[type="text"]:focus{
   border-color:var(--green-accent);
   box-shadow:0 0 0 2px rgba(102,187,106,0.25);
 }
@@ -141,7 +146,7 @@
   display:flex;
   align-items:center;
   gap:8px;
-  font-size:13px;
+  font-size:0.95rem;
   font-weight:600;
   color:var(--green-dark);
 }
@@ -233,7 +238,7 @@
 }
 
 .cellDate{
-  font-size:13px;
+  font-size:15px;
   font-weight:600;
   color:#333;
   padding:6px;
@@ -382,3 +387,145 @@
   position:sticky;
   top:0;
 }
+
+/* =========================================================
+   CLOCK PICKER
+========================================================= */
+
+.time-picker-modal{
+  position:fixed;
+  inset:0;
+  width:100vw;
+  height:100vh;
+  max-width:none;
+  max-height:none;
+  border:none;
+  padding:0;
+  margin:0;
+  background:transparent;
+}
+
+.time-picker-modal[open]{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:16px;
+}
+
+.time-picker-modal::backdrop{
+  background:rgba(0,0,0,0.55);
+}
+
+.time-picker-card{
+  width:min(360px, 92vw);
+  background:#fff;
+  border-radius:18px;
+  padding:18px;
+  box-shadow:0 20px 44px rgba(0,0,0,0.28);
+}
+
+.time-picker-card h3{
+  margin:0;
+  color:var(--green-dark);
+  text-align:center;
+}
+
+.time-picker-readout{
+  margin-top:8px;
+  text-align:center;
+  font-size:26px;
+  font-weight:600;
+  color:#1d3557;
+}
+
+.time-picker-mode-row{
+  display:flex;
+  gap:8px;
+  margin-top:10px;
+}
+
+.time-picker-mode-row button{
+  flex:1;
+  border:1px solid #c8e6c9;
+  background:#f3f8f4;
+  border-radius:10px;
+  padding:8px;
+  cursor:pointer;
+}
+
+.time-picker-mode-row button.active{
+  background:#2e7d32;
+  color:#fff;
+  border-color:#2e7d32;
+}
+
+.time-picker-dial{
+  position:relative;
+  width:260px;
+  height:260px;
+  margin:14px auto 0;
+  border-radius:50%;
+  background:radial-gradient(circle at center, #f9fffb 40%, #e8f5e9 100%);
+  border:1px solid #c8e6c9;
+}
+
+.time-picker-marks{
+  position:absolute;
+  inset:0;
+}
+
+.time-picker-mark{
+  position:absolute;
+  left:50%;
+  top:50%;
+  transform:translate(-50%, -50%);
+  width:28px;
+  text-align:center;
+  font-size:13px;
+  font-weight:600;
+  line-height:1;
+  color:#2c3e50;
+  user-select:none;
+}
+
+.time-picker-hand{
+  position:absolute;
+  left:50%;
+  top:50%;
+  width:2px;
+  height:88px;
+  background:#1565c0;
+  transform-origin:bottom center;
+  translate:-50% -100%;
+  border-radius:2px;
+}
+
+.time-picker-center-dot{
+  position:absolute;
+  left:50%;
+  top:50%;
+  width:12px;
+  height:12px;
+  margin-left:-6px;
+  margin-top:-6px;
+  border-radius:50%;
+  background:#1565c0;
+}
+
+.time-picker-actions{
+  margin-top:14px;
+  display:flex;
+  justify-content:flex-end;
+  gap:10px;
+}
+
+.time-picker-actions .cancel,
+.time-picker-actions .save{
+  border:none;
+  border-radius:10px;
+  padding:9px 14px;
+  cursor:pointer;
+}
+
+.time-picker-actions .cancel{ background:#ccc; }
+.time-picker-actions .save{ background:linear-gradient(120deg,#1b5e20,#26a69a); color:#fff; }
