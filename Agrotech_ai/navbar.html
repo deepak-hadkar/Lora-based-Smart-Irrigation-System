@@ -37,6 +37,23 @@
     <label for="editProfileName" id="displayNameLabel">Display Name</label>
     <input id="editProfileName" type="text" maxlength="40" placeholder="Enter your name">
 
+    <label for="editProfileMobile" id="mobileNumberLabel">Mobile Number</label>
+    <input id="editProfileMobile" type="tel" maxlength="20" placeholder="Enter mobile number" inputmode="tel" autocomplete="tel">
+
+    <label for="editProfileRegion" id="regionLabel">Region</label>
+    <input id="editProfileRegion" type="text" maxlength="50" placeholder="Enter region/state" autocomplete="address-level1">
+
+    <label for="editProfileCity" id="cityLabel">City</label>
+    <input id="editProfileCity" type="text" maxlength="50" placeholder="Enter city" autocomplete="address-level2">
+
+    <label for="editProfileExcelPath" id="excelPathLabel">Excel Path</label>
+    <div class="profile-file-row">
+      <input id="editProfileExcelPath" type="text" maxlength="260" placeholder="Enter Excel path" autocomplete="off">
+      <button type="button" id="pickExcelPathBtn">Browse</button>
+    </div>
+    <p id="excelPathHint" class="profile-field-hint">For drive path, type manually (example: D:\Farm\weather.xlsx).</p>
+    <input id="excelPathPicker" type="file" accept=".xlsx,.xls,.csv" style="display:none" aria-hidden="true">
+
     <p id="profileEditError" class="profile-edit-error hide"></p>
 
     <div class="profile-edit-actions">
