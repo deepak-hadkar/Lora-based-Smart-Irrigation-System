@@ -50,14 +50,14 @@ const cal = {
       durationMin: "min"
     },
     hi: {
-      calTitle: "सिंचाई शेड्यूलर",
+      calTitle: "सिंचाई समय-सारणी",
       cancelAllBtn: "सभी रद्द करें",
-      simulateBtn: "सिमुलेट",
-      calendarLabel: "कैलेंडर",
+      simulateBtn: "अनुकरण करें",
+      calendarLabel: "दिनदर्शिका",
       historyLabel: "इतिहास",
-      scheduleFormTitle: "सिंचाई शेड्यूल करें",
+      scheduleFormTitle: "सिंचाई समय-सारणी बनाएं",
       dateLabel: "तारीख",
-      scheduleTypeLabel: "शेड्यूल प्रकार",
+      scheduleTypeLabel: "समय-सारणी प्रकार",
       scheduleTypeSingle: "एकल तारीख",
       scheduleTypeMonth: "पूरा महीना",
       scheduleTypeWeekdays: "विशिष्ट सप्ताह के दिन",
@@ -68,27 +68,27 @@ const cal = {
       weekdayThursday: "गुरुवार",
       weekdayFriday: "शुक्रवार",
       weekdaySaturday: "शनिवार",
-      valveOnLabel: "वाल्व ON",
-      valveOffLabel: "वाल्व OFF",
+      valveOnLabel: "वाल्व चालू",
+      valveOffLabel: "वाल्व बंद",
       cancelBtn: "रद्द करें",
       saveBtn: "सहेजें",
-      deleteBtn: "शेड्यूल रद्द करें",
+      deleteBtn: "समय-सारणी रद्द करें",
       historyTitle: "सिंचाई इतिहास",
       exportCsvBtn: "CSV निर्यात करें",
       historyDateHead: "तारीख",
-      historyOnHead: "ON",
-      historyOffHead: "OFF",
+      historyOnHead: "चालू",
+      historyOffHead: "बंद",
       historySourceHead: "स्रोत",
       historyStatusHead: "स्थिति",
       historyCompletedHead: "पूर्ण हुआ",
       historyDurationHead: "अवधि",
-      confirmCancelAll: "क्या सभी सिंचाई शेड्यूल रद्द करें?\nइसे वापस नहीं किया जा सकता।",
-      allCancelled: "सभी शेड्यूल रद्द किए गए",
+      confirmCancelAll: "क्या सभी सिंचाई समय-सारणियां रद्द करें?\nइसे वापस नहीं किया जा सकता।",
+      allCancelled: "सभी समय-सारणियां रद्द की गईं",
       runningBadge: "चालू",
       confirmCancelDate: "क्या इस तारीख की सिंचाई रद्द करें?",
-      selectOnOff: "ON और OFF समय चुनें",
+      selectOnOff: "चालू और बंद समय चुनें",
       selectWeekdays: "सप्ताह के दिन चुनें",
-      noScheduleToday: "आज कोई शेड्यूल नहीं है",
+      noScheduleToday: "आज कोई समय-सारणी नहीं है",
       statusCompleted: "पूर्ण",
       sourceSingle: "एकल तारीख",
       sourceMonthly: "पूरा महीना",
@@ -97,14 +97,14 @@ const cal = {
       durationMin: "मिनट"
     },
     mr: {
-      calTitle: "सिंचन शेड्युलर",
+      calTitle: "सिंचन वेळापत्रक",
       cancelAllBtn: "सर्व रद्द करा",
-      simulateBtn: "सिम्युलेट",
-      calendarLabel: "कॅलेंडर",
+      simulateBtn: "अनुकरण करा",
+      calendarLabel: "दिनदर्शिका",
       historyLabel: "इतिहास",
-      scheduleFormTitle: "सिंचन शेड्युल करा",
+      scheduleFormTitle: "सिंचन वेळापत्रक तयार करा",
       dateLabel: "तारीख",
-      scheduleTypeLabel: "शेड्युल प्रकार",
+      scheduleTypeLabel: "वेळापत्रक प्रकार",
       scheduleTypeSingle: "एकच तारीख",
       scheduleTypeMonth: "संपूर्ण महिना",
       scheduleTypeWeekdays: "विशिष्ट आठवड्याचे दिवस",
@@ -115,27 +115,27 @@ const cal = {
       weekdayThursday: "गुरुवार",
       weekdayFriday: "शुक्रवार",
       weekdaySaturday: "शनिवार",
-      valveOnLabel: "व्हॉल्व ON",
-      valveOffLabel: "व्हॉल्व OFF",
+      valveOnLabel: "नळ चालू",
+      valveOffLabel: "नळ बंद",
       cancelBtn: "रद्द करा",
-      saveBtn: "सेव्ह करा",
-      deleteBtn: "शेड्युल रद्द करा",
+      saveBtn: "जतन करा",
+      deleteBtn: "वेळापत्रक रद्द करा",
       historyTitle: "सिंचन इतिहास",
       exportCsvBtn: "CSV निर्यात करा",
       historyDateHead: "तारीख",
-      historyOnHead: "ON",
-      historyOffHead: "OFF",
+      historyOnHead: "चालू",
+      historyOffHead: "बंद",
       historySourceHead: "स्रोत",
       historyStatusHead: "स्थिती",
       historyCompletedHead: "पूर्ण",
       historyDurationHead: "कालावधी",
-      confirmCancelAll: "सर्व सिंचन शेड्युल रद्द करायचे का?\nहे परत आणता येणार नाही.",
-      allCancelled: "सर्व शेड्युल रद्द झाले",
+      confirmCancelAll: "सर्व सिंचन वेळापत्रके रद्द करायची का?\nहे परत आणता येणार नाही.",
+      allCancelled: "सर्व वेळापत्रके रद्द झाली",
       runningBadge: "चालू",
       confirmCancelDate: "या तारखेचे सिंचन रद्द करायचे का?",
-      selectOnOff: "ON आणि OFF वेळ निवडा",
+      selectOnOff: "चालू आणि बंद वेळ निवडा",
       selectWeekdays: "आठवड्याचे दिवस निवडा",
-      noScheduleToday: "आज कोणतेही शेड्युल नाही",
+      noScheduleToday: "आज कोणतेही वेळापत्रक नाही",
       statusCompleted: "पूर्ण",
       sourceSingle: "एकच तारीख",
       sourceMonthly: "संपूर्ण महिना",
@@ -148,6 +148,13 @@ const cal = {
   schedules: {},
   executions: {},
   history: {},
+  timePicker: {
+    open: false,
+    mode: "hour",
+    hour: 0,
+    minute: 0,
+    target: null
+  },
 
   sDay: 0,
   sMth: 0,
@@ -285,6 +292,13 @@ const cal = {
     this.fDate = evtDate;
     this.fOn = document.getElementById("event-start-time");
     this.fOff = document.getElementById("event-end-time");
+    this.tpModal = document.getElementById("timePickerModal");
+    this.tpReadout = document.getElementById("timePickerReadout");
+    this.tpDial = document.getElementById("timePickerDial");
+    this.tpHand = document.getElementById("timePickerHand");
+    this.tpMarks = document.getElementById("timePickerMarks");
+    this.tpHourBtn = document.getElementById("pickHourBtn");
+    this.tpMinuteBtn = document.getElementById("pickMinuteBtn");
 
     this.hY.addEventListener("blur", () => {
       const parsedYear = this.parseLocalizedNumber(this.hY.value, this.sYear);
@@ -293,13 +307,14 @@ const cal = {
 
     [this.fOn, this.fOff].forEach(input => {
       if (!input) return;
-      input.addEventListener("focus", () => {
-        input.value = this.normalizeDigits(input.value);
-      });
-      input.addEventListener("blur", () => {
-        input.value = this.localizeTimeDisplay(input.value);
-      });
+      input.addEventListener("click", () => this.openTimePicker(input));
     });
+
+    if (this.tpHourBtn) this.tpHourBtn.onclick = () => this.setTimePickerMode("hour");
+    if (this.tpMinuteBtn) this.tpMinuteBtn.onclick = () => this.setTimePickerMode("minute");
+    if (timePickerCancelBtn) timePickerCancelBtn.onclick = () => this.closeTimePicker(false);
+    if (timePickerSetBtn) timePickerSetBtn.onclick = () => this.closeTimePicker(true);
+    if (this.tpDial) this.tpDial.addEventListener("click", this.onTimeDialClick.bind(this));
 
     // Month init
     const now = new Date();
@@ -553,6 +568,113 @@ const cal = {
 
   btn.disabled = Object.keys(this.schedules || {}).length === 0;
 },
+
+  openTimePicker(targetInput) {
+    if (!this.tpModal || !targetInput) return;
+
+    const parsed = this.normalizeTimeInput(targetInput.value) || "00:00";
+    const [hh, mm] = parsed.split(":").map(Number);
+
+    this.timePicker.target = targetInput;
+    this.timePicker.hour = Number.isFinite(hh) ? hh : 0;
+    this.timePicker.minute = Number.isFinite(mm) ? mm : 0;
+    this.timePicker.open = true;
+
+    this.setTimePickerMode("hour");
+    if (typeof this.tpModal.showModal === "function") {
+      this.tpModal.showModal();
+    }
+  },
+
+  closeTimePicker(apply) {
+    if (!this.tpModal) return;
+
+    if (apply && this.timePicker.target) {
+      const value = `${String(this.timePicker.hour).padStart(2, "0")}:${String(this.timePicker.minute).padStart(2, "0")}`;
+      this.timePicker.target.value = this.localizeTimeDisplay(value);
+    }
+
+    if (typeof this.tpModal.close === "function") {
+      this.tpModal.close();
+    }
+    this.timePicker.open = false;
+    this.timePicker.target = null;
+  },
+
+  setTimePickerMode(mode) {
+    this.timePicker.mode = mode === "minute" ? "minute" : "hour";
+    if (this.tpHourBtn) this.tpHourBtn.classList.toggle("active", this.timePicker.mode === "hour");
+    if (this.tpMinuteBtn) this.tpMinuteBtn.classList.toggle("active", this.timePicker.mode === "minute");
+    this.renderTimePicker();
+  },
+
+  renderTimePicker() {
+    if (!this.tpReadout || !this.tpMarks || !this.tpHand) return;
+
+    const timeText = `${String(this.timePicker.hour).padStart(2, "0")}:${String(this.timePicker.minute).padStart(2, "0")}`;
+    this.tpReadout.textContent = this.localizeTimeDisplay(timeText) || timeText;
+
+    this.tpMarks.innerHTML = "";
+    if (this.timePicker.mode === "hour") {
+      for (let i = 0; i < 24; i += 1) {
+        const angle = i * 15;
+        const rad = ((angle - 90) * Math.PI) / 180;
+        const r = 104;
+        const x = Math.cos(rad) * r;
+        const y = Math.sin(rad) * r;
+
+        const mark = document.createElement("div");
+        mark.className = "time-picker-mark";
+        mark.style.left = `calc(50% + ${x}px)`;
+        mark.style.top = `calc(50% + ${y}px)`;
+        mark.textContent = this.formatNumber(String(i).padStart(2, "0"));
+        this.tpMarks.appendChild(mark);
+      }
+
+      const hourAngle = this.timePicker.hour * 15;
+      this.tpHand.style.transform = `rotate(${hourAngle}deg)`;
+    } else {
+      for (let i = 0; i < 60; i += 5) {
+        const angle = i * 6;
+        const rad = ((angle - 90) * Math.PI) / 180;
+        const r = 104;
+        const x = Math.cos(rad) * r;
+        const y = Math.sin(rad) * r;
+
+        const mark = document.createElement("div");
+        mark.className = "time-picker-mark";
+        mark.style.left = `calc(50% + ${x}px)`;
+        mark.style.top = `calc(50% + ${y}px)`;
+        mark.textContent = this.formatNumber(String(i).padStart(2, "0"));
+        this.tpMarks.appendChild(mark);
+      }
+
+      const minuteAngle = this.timePicker.minute * 6;
+      this.tpHand.style.transform = `rotate(${minuteAngle}deg)`;
+    }
+  },
+
+  onTimeDialClick(event) {
+    if (!this.tpDial) return;
+
+    const rect = this.tpDial.getBoundingClientRect();
+    const cx = rect.left + rect.width / 2;
+    const cy = rect.top + rect.height / 2;
+    const dx = event.clientX - cx;
+    const dy = event.clientY - cy;
+
+    let deg = (Math.atan2(dy, dx) * 180) / Math.PI + 90;
+    if (deg < 0) deg += 360;
+
+    if (this.timePicker.mode === "hour") {
+      this.timePicker.hour = Math.round(deg / 15) % 24;
+      this.renderTimePicker();
+      return;
+    }
+
+    this.timePicker.minute = Math.round(deg / 6) % 60;
+    this.renderTimePicker();
+  },
 
 };
 
