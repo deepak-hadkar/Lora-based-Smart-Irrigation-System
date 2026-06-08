@@ -116,6 +116,22 @@
   color: #1b5e20;
 }
 
+.device-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.device-header .device-delete-btn {
+  color: #c62828;
+  font-size: 16px;
+  line-height: 1;
+}
+
+.device-header .device-delete-btn:hover {
+  transform: scale(1.08);
+}
+
 /* ================= DEVICE TOGGLES ================= */
 .device-toggle-box {
   display: flex;
@@ -162,6 +178,10 @@
   transition: transform .15s ease, box-shadow .15s ease;
 }
 
+.card.percent-card {
+  background: var(--percent-card-bg, #f6f9f7);
+}
+
 .card-header {
   display: flex;
   align-items: center;
@@ -170,6 +190,10 @@
   padding-left: 0;
   text-align: left;
   word-break: break-word;
+}
+
+.card.has-drag-handle .card-header {
+  padding-left: 30px;
 }
 
 .card-value {
@@ -182,7 +206,8 @@
 }
 
 .card-value .toggle,
-.card-value input[type="number"] {
+.card-value input[type="number"],
+.card-value .threshold-input {
   margin-top: 0;
 }
 
@@ -204,10 +229,19 @@
     text-align: center;
   }
 
+  .card.has-drag-handle .card-header {
+    padding-left: 0;
+  }
+
   .card-value {
     justify-content: center;
     text-align: center;
     width: 100%;
+  }
+
+  .drag-handle {
+    left: auto;
+    right: 8px;
   }
 }
 
@@ -227,6 +261,19 @@
   cursor: grab;
   font-size: 13px;
   line-height: 1;
+}
+
+.drag-handle::before {
+  content: "";
+  width: 12px;
+  height: 10px;
+  background: repeating-linear-gradient(
+    to bottom,
+    #1b5e20 0,
+    #1b5e20 2px,
+    transparent 2px,
+    transparent 4px
+  );
 }
 
 .drag-handle:active {
@@ -253,13 +300,14 @@
 }
 
 /* ================= THRESHOLD INPUT ================= */
-.card input[type="number"] {
+.card input[type="number"],
+.card .threshold-input {
   margin-top: 6px;
-  width: min(140px, 100%);
-  padding: 6px;
+  width: min(190px, 100%);
+  padding: 9px 10px;
   border-radius: 8px;
   border: 1px solid #ccc;
-  font-size: 14px;
+  font-size: 16px;
   text-align: center;
 }
 
@@ -341,6 +389,13 @@
   margin-top: 4px;
 }
 
+.modal-box input[type="checkbox"] {
+  width: auto;
+  padding: 0;
+  border: none;
+  margin-top: 0;
+}
+
 .modal-box select {
   width: 100%;
   padding: 8px;
@@ -353,17 +408,19 @@
 /* ================= CARD OPTIONS ================= */
 .card-options {
   margin-top: 14px;
+  display: grid;
+  gap: 10px;
 }
 
 .card-option {
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-columns: 1fr auto;
   gap: 8px;
   font-size: 13px;
-  margin-bottom: 10px;
   background: #f6f9f7;
-  border-radius: 10px;
-  padding: 10px;
+  border-radius: 12px;
+  padding: 12px;
+  border: 1px solid #dce8dd;
 }
 
 .card-option-head {
@@ -371,6 +428,21 @@
   align-items: center;
   justify-content: space-between;
   gap: 10px;
+  grid-column: 1;
+}
+
+#addDeviceCardChoices .card-option-head {
+  justify-content: flex-start;
+  flex-wrap: nowrap;
+  gap: 8px;
+}
+
+#addDeviceCardChoices .card-option-head input[type="checkbox"] {
+  flex: 0 0 auto;
+}
+
+#addDeviceCardChoices .card-option-head span {
+  flex: 1 1 auto;
 }
 
 .card-option-title {
@@ -380,8 +452,9 @@
 
 .card-option-controls {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1.5fr 1fr;
   gap: 8px;
+  grid-column: 1;
 }
 
 .card-option-controls input,
@@ -397,12 +470,16 @@
   color: #fff;
   cursor: pointer;
   font-size: 12px;
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  align-self: center;
 }
 
 .add-card-row {
   display: grid;
   grid-template-columns: 1fr auto;
   gap: 8px;
+  align-items: center;
 }
 
 .add-card-row button {
@@ -410,6 +487,7 @@
   border-radius: 10px;
   background: #2e7d32;
   color: #fff;
+  min-height: 38px;
   padding: 0 14px;
   cursor: pointer;
 }
@@ -458,6 +536,16 @@
 
   .card-option-controls {
     grid-template-columns: 1fr;
+  }
+
+  .card-option {
+    grid-template-columns: 1fr;
+  }
+
+  .card-option .remove-card {
+    grid-column: 1;
+    grid-row: auto;
+    justify-self: end;
   }
 
   .modal-actions {
